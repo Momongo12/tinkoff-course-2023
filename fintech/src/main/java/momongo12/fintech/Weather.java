@@ -1,10 +1,7 @@
 package momongo12.fintech;
 
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.Map;
@@ -18,6 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
+@ToString
 public class Weather {
 
     private final int regionId;
