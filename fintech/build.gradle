@@ -19,13 +19,28 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.junit.platform:junit-platform-runner:1.10.0'
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'momongo12.fintech.Main'
+configurations {
+    runtimeClasspath {
+        extendsFrom testCompileClasspath, testRuntimeClasspath, testImplementation
     }
 }
+
+
+tasks.register('createFatJar', Jar) {
+    manifest {
+        attributes 'Main-Class': 'momongo12.fintech.TestRunner'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from sourceSets.test.output
+    with jar
+}
+
 
 test {
     useJUnitPlatform()
