@@ -1,6 +1,11 @@
 package momongo12.fintech;
 
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,6 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Momongo12
  * @version 1.0
  */
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Weather {
 
     private final int regionId;
@@ -21,12 +28,6 @@ public class Weather {
     private static final Map<String, Integer> regionNameToRegionId = new ConcurrentHashMap<>();
     private static final AtomicInteger nextRegionId = new AtomicInteger(1);
 
-    private Weather(int regionId, String regionName, double temperatureValue, Instant measuringDate) {
-        this.regionId = regionId;
-        this.regionName = regionName;
-        this.temperatureValue = temperatureValue;
-        this.measuringDate = measuringDate;
-    }
 
     /**
      * Creates a new Weather object for the specified region and temperature value.
@@ -45,21 +46,5 @@ public class Weather {
 
     private static int getRegionIdByRegionName(String regionName) {
         return regionNameToRegionId.computeIfAbsent(regionName, key -> nextRegionId.getAndIncrement());
-    }
-
-    public int getRegionId() {
-        return regionId;
-    }
-
-    public String getRegionName() {
-        return regionName;
-    }
-
-    public double getTemperatureValue() {
-        return temperatureValue;
-    }
-
-    public Instant getMeasuringDate() {
-        return measuringDate;
     }
 }

@@ -1,6 +1,9 @@
 package momongo12.fintech;
 
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,9 +14,8 @@ import java.util.stream.Collectors;
  * @author Momongo12
  * @version 1.0
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeatherUtils {
-
-    private WeatherUtils() {}
 
     /**
      * Calculates the average temperature from a list of Weather objects.
