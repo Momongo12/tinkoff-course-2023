@@ -1,8 +1,9 @@
 package momongo12.fintech;
 
 
-import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -12,21 +13,29 @@ import java.util.Map;
 
 public class WeatherUtilsTest {
 
-    private List<Weather> weatherList;
+    private static List<Weather> weatherListTestCase1;
+    private static List<Weather> weatherListTestCase2;
 
-    @BeforeEach
-    public void init() {
-        weatherList = new ArrayList<>();
-        weatherList.add(WeatherFactory.createWeather("region1", 1.0));
-        weatherList.add(WeatherFactory.createWeather("region2", 2.0));
-        weatherList.add(WeatherFactory.createWeather("region3", 3.0));
-        weatherList.add(WeatherFactory.createWeather("region4", 4.0));
-        weatherList.add(WeatherFactory.createWeather("region5", 5.0));
+    @BeforeAll
+    public static void init() {
+        weatherListTestCase1 = new ArrayList<>();
+        weatherListTestCase1.add(WeatherFactory.createWeather("region1", 1.0));
+        weatherListTestCase1.add(WeatherFactory.createWeather("region2", 2.0));
+        weatherListTestCase1.add(WeatherFactory.createWeather("region3", 3.0));
+        weatherListTestCase1.add(WeatherFactory.createWeather("region4", 4.0));
+        weatherListTestCase1.add(WeatherFactory.createWeather("region5", 5.0));
+
+        weatherListTestCase2 = new ArrayList<>();
+        weatherListTestCase2.add(WeatherFactory.createWeather("region1", 1.0));
+        weatherListTestCase2.add(WeatherFactory.createWeather("region2", 2.0));
+        weatherListTestCase2.add(WeatherFactory.createWeather("region2", 3.0));
+        weatherListTestCase2.add(WeatherFactory.createWeather("region4", 1.0));
+        weatherListTestCase2.add(WeatherFactory.createWeather("region5", 5.0));
     }
 
     @Test
     public void testCalculateAverageTemperature() {
-        double averageTemperature = WeatherUtils.calculateAverageTemperature(weatherList);
+        double averageTemperature = WeatherUtils.calculateAverageTemperature(weatherListTestCase1);
 
         assertEquals(averageTemperature, 3.0, 0.1);
     }
@@ -35,7 +44,7 @@ public class WeatherUtilsTest {
     public void testFindRegionsWithTemperatureLargerSome() {
         double targetTemperature = 3.0;
 
-        List<String> regions = WeatherUtils.findRegionsWithTemperatureLargerSome(weatherList, targetTemperature);
+        List<String> regions = WeatherUtils.findRegionsWithTemperatureLargerSome(weatherListTestCase1, targetTemperature);
 
         assertNotNull(regions);
         assertTrue(regions.contains("region4"));
@@ -44,10 +53,10 @@ public class WeatherUtilsTest {
 
     @Test
     public void testConvertToMapGroupingByRegionId() {
-        int idSomeRegion = weatherList.get(0).getRegionId();
-        double temperatureSameRegion = weatherList.get(0).getTemperatureValue();
+        int idSomeRegion = weatherListTestCase1.get(0).getRegionId();
+        double temperatureSameRegion = weatherListTestCase1.get(0).getTemperatureValue();
 
-        Map<Integer, List<Double>> convertedWeatherList = WeatherUtils.convertToMapGroupingByRegionId(weatherList);
+        Map<Integer, List<Double>> convertedWeatherList = WeatherUtils.convertToMapGroupingByRegionId(weatherListTestCase1);
 
         assertNotNull(convertedWeatherList);
         assertEquals(5, convertedWeatherList.size());
@@ -56,14 +65,40 @@ public class WeatherUtilsTest {
     }
 
     @Test
-    public void testConvertToMapGroupingByTemperature() {
-        Double temperatureSomeRegion = weatherList.get(0).getTemperatureValue();
-        Weather weatherObjectWithSameTemperature = weatherList.get(0);
+    public void testConvertToMapGroupingByRegionIdWithRepeatingRegionId() {
+        int idSomeRegion = weatherListTestCase2.get(0).getRegionId();
+        double temperatureSameRegion = weatherListTestCase2.get(0).getTemperatureValue();
 
-        Map<Double, Collection<Weather>> convertedWeatherList = WeatherUtils.convertToMapGroupingByTemperature(weatherList);
+        Map<Integer, List<Double>> convertedWeatherList = WeatherUtils.convertToMapGroupingByRegionId(weatherListTestCase2);
+
+        assertNotNull(convertedWeatherList);
+        assertEquals(4, convertedWeatherList.size());
+        assertTrue(convertedWeatherList.containsKey(idSomeRegion));
+        assertTrue(convertedWeatherList.get(idSomeRegion).contains(temperatureSameRegion));
+    }
+
+    @Test
+    public void testConvertToMapGroupingByTemperature() {
+        Double temperatureSomeRegion = weatherListTestCase1.get(0).getTemperatureValue();
+        Weather weatherObjectWithSameTemperature = weatherListTestCase1.get(0);
+
+        Map<Double, Collection<Weather>> convertedWeatherList = WeatherUtils.convertToMapGroupingByTemperature(weatherListTestCase1);
 
         assertNotNull(convertedWeatherList);
         assertEquals(5, convertedWeatherList.size());
+        assertTrue(convertedWeatherList.containsKey(temperatureSomeRegion));
+        assertTrue(convertedWeatherList.get(temperatureSomeRegion).contains(weatherObjectWithSameTemperature));
+    }
+
+    @Test
+    public void testConvertToMapGroupingByTemperatureWithRepeatingTemperature() {
+        Double temperatureSomeRegion = weatherListTestCase2.get(0).getTemperatureValue();
+        Weather weatherObjectWithSameTemperature = weatherListTestCase2.get(0);
+
+        Map<Double, Collection<Weather>> convertedWeatherList = WeatherUtils.convertToMapGroupingByTemperature(weatherListTestCase2);
+
+        assertNotNull(convertedWeatherList);
+        assertEquals(4, convertedWeatherList.size());
         assertTrue(convertedWeatherList.containsKey(temperatureSomeRegion));
         assertTrue(convertedWeatherList.get(temperatureSomeRegion).contains(weatherObjectWithSameTemperature));
     }
