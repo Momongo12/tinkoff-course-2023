@@ -17,11 +17,11 @@ public class WeatherUtilsTest {
     @BeforeEach
     public void init() {
         weatherList = new ArrayList<>();
-        weatherList.add(Weather.createWeather("region1", 1.0));
-        weatherList.add(Weather.createWeather("region2", 2.0));
-        weatherList.add(Weather.createWeather("region3", 3.0));
-        weatherList.add(Weather.createWeather("region4", 4.0));
-        weatherList.add(Weather.createWeather("region5", 5.0));
+        weatherList.add(WeatherFactory.createWeather("region1", 1.0));
+        weatherList.add(WeatherFactory.createWeather("region2", 2.0));
+        weatherList.add(WeatherFactory.createWeather("region3", 3.0));
+        weatherList.add(WeatherFactory.createWeather("region4", 4.0));
+        weatherList.add(WeatherFactory.createWeather("region5", 5.0));
     }
 
     @Test
