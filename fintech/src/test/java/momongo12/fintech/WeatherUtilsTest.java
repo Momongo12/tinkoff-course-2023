@@ -57,10 +57,10 @@ public class WeatherUtilsTest {
 
     @Test
     public void testConvertToMapGroupingByTemperature() {
-        Integer temperatureSomeRegion = (int) weatherList.get(0).getTemperatureValue();
+        Double temperatureSomeRegion = weatherList.get(0).getTemperatureValue();
         Weather weatherObjectWithSameTemperature = weatherList.get(0);
 
-        Map<Integer, Collection<Weather>> convertedWeatherList = WeatherUtils.convertToMapGroupingByTemperature(weatherList);
+        Map<Double, Collection<Weather>> convertedWeatherList = WeatherUtils.convertToMapGroupingByTemperature(weatherList);
 
         assertNotNull(convertedWeatherList);
         assertEquals(5, convertedWeatherList.size());

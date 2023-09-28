@@ -41,7 +41,7 @@ public class WeatherUtils {
     public static List<String> findRegionsWithTemperatureLargerSome(List<Weather> weatherList, double temperature) {
         return weatherList
                 .stream()
-                .filter(weather -> Double.compare(temperature, weather.getTemperatureValue()) < 0)
+                .filter(weather -> weather.getTemperatureValue() > temperature)
                 .map(Weather::getRegionName)
                 .collect(Collectors.toList());
     }
@@ -67,10 +67,10 @@ public class WeatherUtils {
      * @return A map where keys are rounded temperatures and values are collections of Weather objects.
      * @implNote In the process, the type of the temperature value is converted to Integer
      */
-    public static Map<Integer, Collection<Weather>> convertToMapGroupingByTemperature(List<Weather> weatherList) {
+    public static Map<Double, Collection<Weather>> convertToMapGroupingByTemperature(List<Weather> weatherList) {
         return weatherList.stream()
                 .collect(Collectors.groupingBy(
-                        weather -> (int) weather.getTemperatureValue(),
+                        Weather::getTemperatureValue,
                         Collectors.toCollection(ArrayList::new)
                 ));
     }
