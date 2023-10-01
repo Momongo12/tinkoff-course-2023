@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @SpringBootTest
 public class WeatherRepositoryImplTest {
@@ -46,7 +46,7 @@ public class WeatherRepositoryImplTest {
     }
 
     @Test
-    void testFindWeatherByRegionIdNameAndMeasuringDate() {
+    void testFindWeatherByRegionIdAndMeasuringDate() {
         Weather weather = weatherFactory.createWeather("region2", 10.0);
         weatherRepository.addWeatherData(weather);
 
@@ -54,7 +54,7 @@ public class WeatherRepositoryImplTest {
     }
 
     @Test
-    void testFindWeatherByRegionIdNameAndMeasuringDateNotFound() {
+    void testFindWeatherByRegionIdAndMeasuringDateNotFound() {
         assertFalse(weatherRepository.findWeatherByRegionIdAndMeasuringDate(2, Instant.now()).isPresent());
     }
 
@@ -65,7 +65,7 @@ public class WeatherRepositoryImplTest {
 
         weatherRepository.deleteWeatherDataByRegionId(weather.getRegionId());
 
-        assertFalse(weatherRepository.findTemperatureDataByRegionId(1).findFirst().isPresent());
+        assertFalse(weatherRepository.findTemperatureDataByRegionId(weather.getRegionId()).findFirst().isPresent());
     }
 
     @Test
