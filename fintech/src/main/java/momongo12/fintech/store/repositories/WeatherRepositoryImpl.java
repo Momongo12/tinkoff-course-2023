@@ -49,10 +49,12 @@ public class WeatherRepositoryImpl implements WeatherRepository {
     }
 
     @Override
-    public void deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException {
+    public long deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException {
         if (!mapOfRegionalTemperatureData.containsKey(regionId)) {
-            throw new NoSuchElementException("Weather data for region with regionId=%d".formatted(regionId));
+            throw new NoSuchElementException("Weather data for region with regionId=%d not found".formatted(regionId));
         }
+        long numberWeatherObjectsAtRegion = findTemperatureDataByRegionId(regionId).count();
         mapOfRegionalTemperatureData.remove(regionId);
+        return numberWeatherObjectsAtRegion;
     }
 }

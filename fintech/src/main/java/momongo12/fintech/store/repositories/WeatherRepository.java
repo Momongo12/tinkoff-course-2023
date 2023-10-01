@@ -43,6 +43,7 @@ public interface WeatherRepository {
      *
      * @param regionId The unique identifier of the region for which weather data will be deleted.
      * @throws NoSuchElementException If no weather data is found for the specified region ID.
+     * @return number deleted weather objects
      */
-    void deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException;
+    long deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException;
 }
