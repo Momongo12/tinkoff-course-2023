@@ -55,7 +55,7 @@ public class WeatherController {
 
     @PutMapping
     public ResponseEntity<WeatherDto> updateTemperature(@PathVariable("regionName") String regionName, WeatherDto weatherDto) {
-        if (weatherService.temperatureWithThisDateAtRegionExist(regionName, LocalDateTime.from(weatherDto.getMeasuringDate()))) {
+        if (weatherService.temperatureWithThisDateAtRegionExist(regionName, weatherDto.getMeasuringDate())) {
             return weatherService
                     .updateTemperatureByRegionName(regionName, weatherDto)
                     .map(weather -> ResponseEntity.status(HttpStatus.OK).body(weatherMapper.weatherToWeatherDto(weather)))
@@ -66,10 +66,10 @@ public class WeatherController {
     }
 
     @DeleteMapping
-    public ResponseEntity<WeatherDto> deleteRegion(@PathVariable("regionName") String regionName) {
+    public ResponseEntity<String> deleteRegion(@PathVariable("regionName") String regionName) {
         return weatherService
                 .deleteRegionData(regionName)
-                .map(weather -> ResponseEntity.status(HttpStatus.OK).body(weatherMapper.weatherToWeatherDto(weather)))
+                .map(num -> ResponseEntity.status(HttpStatus.OK).body("Removed %d weather objects for %s".formatted(num, regionName)))
                 .orElseThrow(() -> new NotFoundException("No temperature data was found for this city"));
     }
 }
