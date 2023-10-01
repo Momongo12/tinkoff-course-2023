@@ -29,7 +29,7 @@ public interface WeatherRepository {
      * @param measuringDate The timestamp indicating when the weather data was measured.
      * @return An Optional containing the Weather object if found, or an empty Optional if not found.
      */
-    Optional<Weather> findWeatherByRegionIdNameAndMeasuringDate (int regionId, Instant measuringDate);
+    Optional<Weather> findWeatherByRegionIdAndMeasuringDate (int regionId, Instant measuringDate);
 
     /**
      * Adds weather data to the data store.
