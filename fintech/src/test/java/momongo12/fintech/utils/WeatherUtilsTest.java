@@ -1,8 +1,9 @@
-package momongo12.fintech;
+package momongo12.fintech.utils;
 
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import momongo12.fintech.store.entities.Weather;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

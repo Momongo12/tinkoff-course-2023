@@ -1,7 +1,8 @@
-package momongo12.fintech;
+package momongo12.fintech.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import momongo12.fintech.store.entities.Weather;
 
 import java.time.Instant;
 import java.util.Map;
