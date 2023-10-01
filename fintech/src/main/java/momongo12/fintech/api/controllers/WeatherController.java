@@ -1,7 +1,12 @@
 package momongo12.fintech.api.controllers;
 
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
 import momongo12.fintech.api.controllers.exceptions.DuplicateResourceException;
 import momongo12.fintech.api.controllers.exceptions.NotFoundException;
@@ -12,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -24,7 +27,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/weather/{regionName}")
-@Api(tags = "Weather Controller")
+@Tag(name = "Weather Controller", description = "Endpoints for managing weather data")
 @RequiredArgsConstructor
 public class WeatherController {
 
@@ -32,13 +35,13 @@ public class WeatherController {
     private final WeatherMapper weatherMapper;
 
     @GetMapping
-    @ApiOperation(value = "Get current temperature data for a specific region", response = WeatherDto.class, responseContainer = "List")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successfully retrieved weather data"),
-            @ApiResponse(code = 404, message = "Weather data not found for the specified region")
+    @Operation(summary = "Get current temperature data for a specific region", responses = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved weather data",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = WeatherDto.class))),
+            @ApiResponse(responseCode = "404", description = "Weather data not found for the specified region")
     })
-    public List<WeatherDto> getCurrentTemperature(
-            @ApiParam(value = "Name of the region", required = true) @PathVariable("regionName") String regionName) {
+    public List<WeatherDto> getCurrentTemperature(@PathVariable("regionName") String regionName) {
         return weatherService
                 .getCurrentTemperatureByRegionName(regionName)
                 .map(weatherMapper::weatherToWeatherDto)
@@ -46,15 +49,14 @@ public class WeatherController {
     }
 
     @PostMapping
-    @ApiOperation(value = "Create new weather data for a specific region", response = WeatherDto.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Weather data created successfully", response = WeatherDto.class),
-            @ApiResponse(code = 400, message = "Invalid request"),
-            @ApiResponse(code = 500, message = "Internal server error")
+    @Operation(summary = "Create new weather data for a specific region", responses = {
+            @ApiResponse(responseCode = "201", description = "Weather data created successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = WeatherDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<WeatherDto> createNewRegion(
-            @ApiParam(value = "Name of the region", required = true) @PathVariable("regionName") String regionName,
-            @ApiParam(value = "Weather data", required = true) @RequestBody WeatherDto weatherDto) {
+    public ResponseEntity<WeatherDto> createNewRegion(@PathVariable("regionName") String regionName, @RequestBody WeatherDto weatherDto) {
         try {
             return weatherService
                     .addNewRegion(regionName, weatherDto)
@@ -66,15 +68,14 @@ public class WeatherController {
     }
 
     @PutMapping
-    @ApiOperation(value = "Update temperature data for a specific region", response = WeatherDto.class)
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Weather data updated successfully", response = WeatherDto.class),
-            @ApiResponse(code = 400, message = "Invalid request"),
-            @ApiResponse(code = 500, message = "Internal server error")
+    @Operation(summary = "Update temperature data for a specific region", responses = {
+            @ApiResponse(responseCode = "200", description = "Weather data updated successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = WeatherDto.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<WeatherDto> updateTemperature(
-            @ApiParam(value = "Name of the region", required = true) @PathVariable("regionName") String regionName,
-            @ApiParam(value = "Weather data", required = true) @RequestBody WeatherDto weatherDto) {
+    public ResponseEntity<WeatherDto> updateTemperature(String regionName, @RequestBody WeatherDto weatherDto) {
         if (weatherService.temperatureWithThisDateAtRegionExist(regionName, weatherDto.getMeasuringDate())) {
             return weatherService
                     .updateTemperatureByRegionName(regionName, weatherDto)
@@ -86,14 +87,14 @@ public class WeatherController {
     }
 
     @DeleteMapping
-    @ApiOperation(value = "Delete weather data for a specific region")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Weather data deleted successfully", response = String.class),
-            @ApiResponse(code = 404, message = "Weather data not found for the specified region"),
-            @ApiResponse(code = 500, message = "Internal server error")
+    @Operation(summary = "Delete weather data for a specific region", responses = {
+            @ApiResponse(responseCode = "200", description = "Weather data deleted successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "404", description = "Weather data not found for the specified region"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<String> deleteRegion(
-            @ApiParam(value = "Name of the region", required = true) @PathVariable("regionName") String regionName) {
+    public ResponseEntity<String> deleteRegion(@PathVariable("regionName") String regionName) {
         return weatherService
                 .deleteRegionData(regionName)
                 .map(num -> ResponseEntity.status(HttpStatus.OK).body("Removed %d weather objects for %s".formatted(num, regionName)))
