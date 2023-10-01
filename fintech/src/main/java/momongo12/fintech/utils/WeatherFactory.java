@@ -3,17 +3,23 @@ package momongo12.fintech.utils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import momongo12.fintech.store.entities.Weather;
+import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+/**
+ * @author Momongo12
+ * @version 1.1
+ */
+@Component
+@NoArgsConstructor
 public class WeatherFactory {
 
-    private static final Map<String, Integer> regionNameToRegionId = new ConcurrentHashMap<>();
-    private static final AtomicInteger nextRegionId = new AtomicInteger(1);
+    private final Map<String, Integer> regionNameToRegionId = new ConcurrentHashMap<>();
+    private final AtomicInteger nextRegionId = new AtomicInteger(1);
 
     /**
      * Creates a new Weather object for the specified region and temperature value.
@@ -24,7 +30,7 @@ public class WeatherFactory {
      * @implNote measuringDate will be initialized with the current time stamp
      * @apiNote This method is thread-safe
      */
-    public static Weather createWeather(String regionName, double temperatureValue) {
+    public Weather createWeather(String regionName, double temperatureValue) {
         return Weather
                 .builder()
                 .regionId(getRegionIdByRegionName(regionName))
@@ -34,7 +40,7 @@ public class WeatherFactory {
                 .build();
     }
 
-    private static int getRegionIdByRegionName(String regionName) {
+    public int getRegionIdByRegionName(String regionName) {
         return regionNameToRegionId.computeIfAbsent(regionName, key -> nextRegionId.getAndIncrement());
     }
 }
