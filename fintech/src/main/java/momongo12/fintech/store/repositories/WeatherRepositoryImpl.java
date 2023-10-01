@@ -4,11 +4,9 @@ import momongo12.fintech.store.entities.Weather;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
 
 
@@ -29,21 +27,32 @@ public class WeatherRepositoryImpl implements WeatherRepository {
 
     @Override
     public Stream<Weather> findTemperatureDataByRegionId(int regionId) {
-        return Stream.empty();
+        return mapOfRegionalTemperatureData
+                .getOrDefault(regionId, new ArrayList<>())
+                .stream();
     }
 
     @Override
     public Optional<Weather> findWeatherByRegionIdAndMeasuringDate(int regionId, Instant measuringDate) {
-        return Optional.empty();
+        return mapOfRegionalTemperatureData
+                .getOrDefault(regionId, new ArrayList<>())
+                .stream()
+                .filter(date -> date.getMeasuringDate().equals(measuringDate))
+                .findFirst();
     }
 
     @Override
     public void addWeatherData(Weather weather) {
-
+        mapOfRegionalTemperatureData
+                .computeIfAbsent(weather.getRegionId(), k -> new CopyOnWriteArrayList<>())
+                .add(weather);
     }
 
     @Override
     public void deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException {
-
+        if (!mapOfRegionalTemperatureData.containsKey(regionId)) {
+            throw new NoSuchElementException("Weather data for region with regionId=%d".formatted(regionId));
+        }
+        mapOfRegionalTemperatureData.remove(regionId);
     }
 }
