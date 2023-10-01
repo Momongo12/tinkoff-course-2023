@@ -18,6 +18,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    mapstructVersion = "1.5.5.Final"
+}
+
 dependencies {
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
@@ -29,6 +33,11 @@ dependencies {
     implementation ('org.springframework.boot:spring-boot-starter-web') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
+
+    // MapStruct
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     // Logging
     implementation 'org.springframework.boot:spring-boot-starter-log4j2'
