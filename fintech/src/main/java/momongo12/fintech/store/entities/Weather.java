@@ -1,4 +1,4 @@
-package momongo12.fintech;
+package momongo12.fintech.store.entities;
 
 
 import lombok.*;
@@ -11,7 +11,7 @@ import java.time.Instant;
  */
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder(access = AccessLevel.PACKAGE)
+@Builder
 public class Weather {
 
     private final int regionId;

@@ -1,36 +1,50 @@
-package momongo12.fintech;
+package momongo12.fintech.utils;
 
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import momongo12.fintech.store.entities.Weather;
+import org.junit.After;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * @author Momongo12
+ * @version 1.1
+ */
+@SpringBootTest
 public class WeatherUtilsTest {
 
-    private static List<Weather> weatherListTestCase1;
-    private static List<Weather> weatherListTestCase2;
+    private final WeatherFactory weatherFactory;
+    private final List<Weather> weatherListTestCase1;
+    private final List<Weather> weatherListTestCase2;
 
-    @BeforeAll
-    public static void init() {
+    @Autowired
+    public WeatherUtilsTest(WeatherFactory weatherFactory) {
+        this.weatherFactory = weatherFactory;
+
         weatherListTestCase1 = new ArrayList<>();
-        weatherListTestCase1.add(WeatherFactory.createWeather("region1", 1.0));
-        weatherListTestCase1.add(WeatherFactory.createWeather("region2", 2.0));
-        weatherListTestCase1.add(WeatherFactory.createWeather("region3", 3.0));
-        weatherListTestCase1.add(WeatherFactory.createWeather("region4", 4.0));
-        weatherListTestCase1.add(WeatherFactory.createWeather("region5", 5.0));
+        weatherListTestCase1.add(weatherFactory.createWeather("region1", 1.0));
+        weatherListTestCase1.add(weatherFactory.createWeather("region2", 2.0));
+        weatherListTestCase1.add(weatherFactory.createWeather("region3", 3.0));
+        weatherListTestCase1.add(weatherFactory.createWeather("region4", 4.0));
+        weatherListTestCase1.add(weatherFactory.createWeather("region5", 5.0));
 
         weatherListTestCase2 = new ArrayList<>();
-        weatherListTestCase2.add(WeatherFactory.createWeather("region1", 1.0));
-        weatherListTestCase2.add(WeatherFactory.createWeather("region2", 2.0));
-        weatherListTestCase2.add(WeatherFactory.createWeather("region2", 3.0));
-        weatherListTestCase2.add(WeatherFactory.createWeather("region4", 1.0));
-        weatherListTestCase2.add(WeatherFactory.createWeather("region5", 5.0));
+        weatherListTestCase2.add(weatherFactory.createWeather("region1", 1.0));
+        weatherListTestCase2.add(weatherFactory.createWeather("region2", 2.0));
+        weatherListTestCase2.add(weatherFactory.createWeather("region2", 3.0));
+        weatherListTestCase2.add(weatherFactory.createWeather("region4", 1.0));
+        weatherListTestCase2.add(weatherFactory.createWeather("region5", 5.0));
     }
 
     @Test
