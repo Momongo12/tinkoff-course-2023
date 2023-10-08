@@ -1,5 +1,6 @@
 package momongo12.fintech.services.remote;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
@@ -30,6 +31,7 @@ public class WeatherApiClient {
         this.restTemplate = restTemplate;
     }
 
+    @RateLimiter(name = "weatherApiRateLimiter")
     public Optional<WeatherApiResponse> getCurrentWeather(String regionName){
         if (regionName == null || regionName.isEmpty()) {
             throw new IllegalArgumentException("Incorrect region name");
