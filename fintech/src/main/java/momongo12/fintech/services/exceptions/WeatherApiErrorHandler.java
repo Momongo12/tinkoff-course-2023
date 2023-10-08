@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import momongo12.fintech.api.controllers.exceptions.InternalServerErrorException;
+import momongo12.fintech.api.controllers.exceptions.NotFoundException;
 import momongo12.fintech.api.dto.WeatherApiErrorResponse;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 import java.io.IOException;
@@ -35,10 +35,15 @@ public class WeatherApiErrorHandler implements ResponseErrorHandler {
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
         if (response.getStatusCode().is4xxClientError()) {
-            HttpStatusCode httpStatus = response.getStatusCode();
             WeatherApiErrorResponse errorResponse = convertInputStreamToErrorResponse(response.getBody());
 
-            throw new InternalServerErrorException("Something went wrong");
+            if (errorResponse.getCode() == 1006) {
+                throw new NotFoundException("No location matching the transmitted region was found");
+            } else if (errorResponse.getCode() >= 2006 && errorResponse.getCode() <= 2009) {
+                throw new WeatherApiTokenKeyException(errorResponse.getMessage());
+            }
+
+            throw new InternalServerErrorException(errorResponse.getMessage());
         }
     }
 
