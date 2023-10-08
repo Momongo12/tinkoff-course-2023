@@ -31,6 +31,17 @@ public class WeatherApiClient {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * Retrieves the current weather information for the specified region.
+     *
+     * @param regionName The name of the region for which weather information is requested.
+     * @return An {@link Optional} containing the {@link WeatherApiResponse} object representing the current weather,
+     *         or an empty {@link Optional} if the weather information is not available or an error occurs.
+     * @throws IllegalArgumentException If the provided region name is null or empty.
+     *
+     * @apiNote This method is rate-limited to prevent excessive API requests.
+     * Requests may be rejected if the monthly limit of requests is exceeded.
+     */
     @RateLimiter(name = "weatherApiRateLimiter")
     public Optional<WeatherApiResponse> getCurrentWeather(String regionName){
         if (regionName == null || regionName.isEmpty()) {
