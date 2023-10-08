@@ -85,11 +85,14 @@ public class WeatherController {
             @ApiResponse(responseCode = "200", description = "Weather data updated successfully",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = WeatherDto.class))),
+            @ApiResponse(responseCode = "201", description = "Weather data created successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = WeatherDto.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<WeatherDto> updateTemperature(String regionName, @RequestBody WeatherDto weatherDto) {
+    public ResponseEntity<WeatherDto> updateTemperature(@PathVariable("regionName") String regionName, @RequestBody WeatherDto weatherDto) {
         if (weatherService.temperatureWithThisDateAtRegionExist(regionName, weatherDto.getMeasuringDate())) {
             return weatherService
                     .updateTemperatureByRegionName(regionName, weatherDto)

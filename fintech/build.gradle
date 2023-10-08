@@ -3,7 +3,6 @@ plugins {
     id 'org.springframework.boot' version '3.1.4'
 }
 
-
 apply plugin: 'io.spring.dependency-management'
 
 java {
@@ -20,6 +19,12 @@ repositories {
 
 ext {
     mapstructVersion = "1.5.5.Final"
+}
+
+configurations {
+    runtimeClasspath {
+        extendsFrom testCompileClasspath, testRuntimeClasspath, testImplementation
+    }
 }
 
 dependencies {
