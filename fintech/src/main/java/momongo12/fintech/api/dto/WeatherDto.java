@@ -1,11 +1,8 @@
 package momongo12.fintech.api.dto;
 
-
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
-
 
 /**
  * @author Momongo12
@@ -15,10 +12,9 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class WeatherDto {
-    int regionId;
-    String regionName;
-    double temperatureValue;
-    Instant measuringDate;
+    private int regionId;
+    private String regionName;
+    private double temperatureValue;
+    private Instant measuringDate;
 }

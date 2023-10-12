@@ -2,7 +2,6 @@ package momongo12.fintech.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -14,43 +13,40 @@ import java.time.Instant;
 @AllArgsConstructor
 @Data
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class WeatherApiResponse {
 
     @JsonProperty("location")
-    Location location;
+    private Location location;
 
     @JsonProperty("current")
-    CurrentWeather weatherData;
+    private CurrentWeather weatherData;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class Location {
         @JsonProperty("region")
-        String regionName;
+        private String regionName;
 
         @JsonProperty("localtime_epoch")
-        Instant localtime;
+        private Instant localtime;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    @FieldDefaults(level = AccessLevel.PRIVATE)
     public static class CurrentWeather {
 
         @JsonProperty("temp_c")
-        BigDecimal temperature;
+        private BigDecimal temperature;
 
         @JsonProperty("wind_kph")
-        BigDecimal windKph;
+        private BigDecimal windKph;
 
         @JsonProperty("wind_dir")
-        String windDir;
+        private String windDir;
 
         @JsonProperty("humidity")
-        Integer humidity;
+        private Integer humidity;
     }
 }

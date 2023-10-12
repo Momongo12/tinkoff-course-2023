@@ -2,8 +2,7 @@ package momongo12.fintech.services.exceptions;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
 import momongo12.fintech.api.controllers.exceptions.InternalServerErrorException;
 import momongo12.fintech.api.controllers.exceptions.NotFoundException;
 import momongo12.fintech.api.dto.WeatherApiErrorResponse;
@@ -16,19 +15,14 @@ import java.io.InputStream;
  * @author Momongo12
  * @version 1.0
  */
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class WeatherApiErrorHandler implements ResponseErrorHandler {
 
-    ObjectMapper objectMapper;
-
-    public WeatherApiErrorHandler(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
+    private final ObjectMapper objectMapper;
 
     @Override
     public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
-        return (
-                httpResponse.getStatusCode().is4xxClientError()
+        return (httpResponse.getStatusCode().is4xxClientError()
                         || httpResponse.getStatusCode().is5xxServerError());
     }
 

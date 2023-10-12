@@ -1,8 +1,6 @@
 package momongo12.fintech.services.remote;
 
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import momongo12.fintech.api.controllers.exceptions.InternalServerErrorException;
 import momongo12.fintech.api.dto.WeatherApiResponse;
@@ -20,11 +18,10 @@ import java.util.Optional;
  * @version 1.0
  */
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Log4j2
 public class WeatherApiClient {
 
-    final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
     public static final String GET_CURRENT_TEMPERATURE = "/current.json";
 
     public WeatherApiClient(@Qualifier("restTemplateForWeatherApi") RestTemplate restTemplate) {

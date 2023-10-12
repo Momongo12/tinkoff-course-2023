@@ -1,8 +1,7 @@
 package momongo12.fintech.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
+import lombok.RequiredArgsConstructor;
 import momongo12.fintech.services.exceptions.WeatherApiErrorHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,14 +15,14 @@ import org.springframework.web.client.RestTemplate;
  * @version 1.1
  */
 @Configuration
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class RestTemplateConfig {
 
     @Value("${app.weather-api.token}")
-    String weatherApiToken;
+    private String weatherApiToken;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public static final String ROOT_URI_FOR_WEATHER_API = "https://api.weatherapi.com/v1";
 
