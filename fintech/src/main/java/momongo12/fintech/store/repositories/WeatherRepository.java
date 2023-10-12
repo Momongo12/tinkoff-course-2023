@@ -1,6 +1,5 @@
 package momongo12.fintech.store.repositories;
 
-
 import momongo12.fintech.store.entities.Weather;
 
 import java.time.Instant;
@@ -29,7 +28,7 @@ public interface WeatherRepository {
      * @param measuringDate The timestamp indicating when the weather data was measured.
      * @return An Optional containing the Weather object if found, or an empty Optional if not found.
      */
-    Optional<Weather> findWeatherByRegionIdAndMeasuringDate (int regionId, Instant measuringDate);
+    Optional<Weather> findWeatherByRegionIdAndMeasuringDate(int regionId, Instant measuringDate);
 
     /**
      * Adds weather data to the data store.
@@ -42,8 +41,8 @@ public interface WeatherRepository {
      * Deletes weather data for a specific region based on the region ID.
      *
      * @param regionId The unique identifier of the region for which weather data will be deleted.
-     * @throws NoSuchElementException If no weather data is found for the specified region ID.
      * @return number deleted weather objects
+     * @throws NoSuchElementException If no weather data is found for the specified region ID.
      */
     long deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException;
 }

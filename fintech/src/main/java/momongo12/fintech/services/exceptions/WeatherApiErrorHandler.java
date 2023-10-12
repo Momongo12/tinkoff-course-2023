@@ -2,12 +2,16 @@ package momongo12.fintech.services.exceptions;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
+
 import momongo12.fintech.api.controllers.exceptions.InternalServerErrorException;
 import momongo12.fintech.api.controllers.exceptions.NotFoundException;
 import momongo12.fintech.api.dto.WeatherApiErrorResponse;
+
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -22,8 +26,7 @@ public class WeatherApiErrorHandler implements ResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse httpResponse) throws IOException {
-        return (httpResponse.getStatusCode().is4xxClientError()
-                        || httpResponse.getStatusCode().is5xxServerError());
+        return httpResponse.getStatusCode().is4xxClientError() || httpResponse.getStatusCode().is5xxServerError();
     }
 
     @Override

@@ -1,8 +1,11 @@
 package momongo12.fintech.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
+
 import momongo12.fintech.services.exceptions.WeatherApiErrorHandler;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;

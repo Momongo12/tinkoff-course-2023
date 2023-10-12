@@ -1,7 +1,9 @@
 package momongo12.fintech.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 
@@ -25,6 +27,7 @@ public class WeatherApiResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Location {
+
         @JsonProperty("region")
         private String regionName;
 
