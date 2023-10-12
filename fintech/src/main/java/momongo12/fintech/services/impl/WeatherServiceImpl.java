@@ -2,18 +2,19 @@ package momongo12.fintech.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
 import momongo12.fintech.api.dto.WeatherDto;
 import momongo12.fintech.services.WeatherService;
 import momongo12.fintech.store.entities.Weather;
 import momongo12.fintech.store.repositories.WeatherRepository;
 import momongo12.fintech.utils.WeatherFactory;
+
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 
 /**
  * @author Momongo12
@@ -35,14 +36,16 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public Optional<Weather> addNewRegion(String regionName, WeatherDto weatherDto) {
         Weather weather;
+
         if (weatherDto.getMeasuringDate() != null) {
             weather = weatherFactory.createWeather(regionName, weatherDto.getTemperatureValue(), weatherDto.getMeasuringDate());
-        }else {
+        } else {
             weather = weatherFactory.createWeather(regionName, weatherDto.getTemperatureValue());
         }
 
         log.info("Adding new weather data for region: {}", regionName);
         weatherRepository.addWeatherData(weather);
+
         return Optional.of(weather);
     }
 
@@ -63,6 +66,7 @@ public class WeatherServiceImpl implements WeatherService {
     public Optional<Long> deleteRegionData(String regionName) {
         try {
             int regionId = weatherFactory.getRegionIdByRegionName(regionName);
+
             log.info("Deleting weather data for region: {}", regionName);
             return Optional.of(weatherRepository.deleteWeatherDataByRegionId(regionId));
         } catch (NoSuchElementException exception) {

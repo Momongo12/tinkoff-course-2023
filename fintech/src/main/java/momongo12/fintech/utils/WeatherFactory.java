@@ -1,8 +1,9 @@
 package momongo12.fintech.utils;
 
-import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
 import momongo12.fintech.store.entities.Weather;
+
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -23,6 +24,7 @@ public class WeatherFactory {
 
     /**
      * Creates a new Weather object for the specified region and temperature value.
+     *
      * @param regionName
      * @param temperatureValue
      * @param measuringDate
@@ -43,6 +45,7 @@ public class WeatherFactory {
 
     /**
      * Creates a new Weather object for the specified region and temperature value.
+     *
      * @param regionName
      * @param temperatureValue
      * @return Weather

@@ -1,8 +1,8 @@
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.4'
+    id 'org.springdoc.openapi-gradle-plugin' version "1.7.0"
 }
-
 
 apply plugin: 'io.spring.dependency-management'
 
@@ -20,6 +20,13 @@ repositories {
 
 ext {
     mapstructVersion = "1.5.5.Final"
+    resilience4jVersion = "2.1.0"
+}
+
+configurations {
+    runtimeClasspath {
+        extendsFrom testCompileClasspath, testRuntimeClasspath, testImplementation
+    }
 }
 
 dependencies {
@@ -33,10 +40,14 @@ dependencies {
     implementation ('org.springframework.boot:spring-boot-starter-web') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
+    implementation ('org.springframework.boot:spring-boot-starter-aop') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 
     // MapStruct
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     // Logging
@@ -50,6 +61,10 @@ dependencies {
 
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+    // resilience4j
+    implementation "io.github.resilience4j:resilience4j-spring-boot3:${resilience4jVersion}"
+
 }
 
 tasks.register('createFatJar', Jar) {
@@ -63,7 +78,6 @@ tasks.register('createFatJar', Jar) {
     from sourceSets.test.output
     with jar
 }
-
 
 test {
     useJUnitPlatform()

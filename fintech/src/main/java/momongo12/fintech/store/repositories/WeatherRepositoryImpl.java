@@ -1,6 +1,7 @@
 package momongo12.fintech.store.repositories;
 
 import momongo12.fintech.store.entities.Weather;
+
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -8,7 +9,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Stream;
-
 
 /**
  * The WeatherRepositoryImpl class represents an implementation of the {@link WeatherRepository} interface.
@@ -53,8 +53,11 @@ public class WeatherRepositoryImpl implements WeatherRepository {
         if (!mapOfRegionalTemperatureData.containsKey(regionId)) {
             throw new NoSuchElementException("Weather data for region with regionId=%d not found".formatted(regionId));
         }
+
         long numberWeatherObjectsAtRegion = findTemperatureDataByRegionId(regionId).count();
+
         mapOfRegionalTemperatureData.remove(regionId);
+
         return numberWeatherObjectsAtRegion;
     }
 }

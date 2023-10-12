@@ -7,10 +7,10 @@ import lombok.*;
  * @version 1.0
  */
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class ErrorResponse {
-    private int statusCode;
+public class WeatherApiErrorResponse {
+    private int code;
     private String message;
 }
