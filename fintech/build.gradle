@@ -21,6 +21,9 @@ repositories {
 ext {
     mapstructVersion = "1.5.5.Final"
     resilience4jVersion = "2.1.0"
+    h2Version = "2.2.224"
+    lombokVersion = "1.18.30"
+    liquibaseVersion = "4.24.0"
 }
 
 configurations {
@@ -31,16 +34,19 @@ configurations {
 
 dependencies {
     // Lombok
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    testCompileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     // Spring
     implementation ('org.springframework.boot:spring-boot-starter-web') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
     implementation ('org.springframework.boot:spring-boot-starter-aop') {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+    implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     }
 
@@ -64,6 +70,11 @@ dependencies {
 
     // resilience4j
     implementation "io.github.resilience4j:resilience4j-spring-boot3:${resilience4jVersion}"
+
+    //database
+    implementation "com.h2database:h2:${h2Version}"
+    implementation "org.liquibase:liquibase-core:${liquibaseVersion}"
+
 
 }
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    
+    <changeSet id="2023-10-15-create-region-table" author="Momongo12">
+        <sql>
+            create table region
+            (
+                id int,
+                name varchar(50),
+                primary key (id)
+            )
+        </sql>
+    </changeSet>
+
+    <changeSet id="2023-10-15-create-weather-type-table" author="Momongo12">
+        <sql>
+            create table weather_type
+            (
+                id int,
+                description varchar(50),
+                representation varchar(30),
+                primary key (id)
+            )
+        </sql>
+    </changeSet>
+    
+    <changeSet id="2023-10-15-create-weather-table" author="Momongo12">
+        <sql>
+            create table weather
+            (
+                id int,
+                temperature float,
+                measuring_date date,
+                weather_type int,
+                region_id int,
+                primary key (id),
+                foreign key (region_id) references region (id),
+                foreign key (weather_type) references weather_type (id)
+            );
+            create index idx_weather_region_id on weather (region_id);
+            create index idx_weather_weather_type on weather (weather_type);
+        </sql>
+    </changeSet>
+</databaseChangeLog>
