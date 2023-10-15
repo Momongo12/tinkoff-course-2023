@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WeatherUtils {
@@ -43,7 +43,7 @@ public class WeatherUtils {
         return weatherList
                 .stream()
                 .filter(weather -> weather.getTemperatureValue() > temperature)
-                .map(Weather::getRegionName)
+                .map(weather -> weather.getRegion().getName())
                 .collect(Collectors.toList());
     }
 
@@ -56,7 +56,7 @@ public class WeatherUtils {
     public static Map<Integer, List<Double>> convertToMapGroupingByRegionId(List<Weather> weatherList) {
         return weatherList.stream()
                 .collect(Collectors.groupingBy(
-                        Weather::getRegionId,
+                        weather -> weather.getRegion().getId(),
                         Collectors.mapping(Weather::getTemperatureValue, Collectors.toList())
                 ));
     }

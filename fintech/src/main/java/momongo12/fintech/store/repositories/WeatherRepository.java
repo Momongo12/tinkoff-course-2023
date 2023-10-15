@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 public interface WeatherRepository {
 
@@ -35,7 +35,15 @@ public interface WeatherRepository {
      *
      * @param weather The Weather object representing the weather data to be added.
      */
-    void addWeatherData(Weather weather);
+    void save(Weather weather);
+
+    /**
+     * Updates the temperature value for a weather record based on the specified weather ID.
+     *
+     * @param weatherId      The unique identifier of the weather record to update.
+     * @param newTemperature The new temperature value to update.
+     */
+    void updateTemperatureById(int weatherId, double newTemperature);
 
     /**
      * Deletes weather data for a specific region based on the region ID.

@@ -4,5 +4,6 @@
                                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
 
     <include file="changelog/schema/2023-10-15-create-base-tables.xml"/>
+    <include file="changelog/schema/sequences.xml"/>
     <include file="changelog/data/data.xml"/>
 </databaseChangeLog>

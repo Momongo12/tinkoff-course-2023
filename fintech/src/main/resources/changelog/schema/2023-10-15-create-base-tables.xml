@@ -9,7 +9,7 @@
         <sql>
             create table region
             (
-                id int,
+                id int AUTO_INCREMENT,
                 name varchar(50),
                 primary key (id)
             )
@@ -20,7 +20,7 @@
         <sql>
             create table weather_type
             (
-                id int,
+                id int AUTO_INCREMENT,
                 description varchar(50),
                 representation varchar(30),
                 primary key (id)
@@ -32,17 +32,17 @@
         <sql>
             create table weather
             (
-                id int,
+                id int AUTO_INCREMENT,
                 temperature float,
                 measuring_date date,
-                weather_type int,
+                weather_type_id int,
                 region_id int,
                 primary key (id),
                 foreign key (region_id) references region (id),
-                foreign key (weather_type) references weather_type (id)
+                foreign key (weather_type_id) references weather_type (id)
             );
             create index idx_weather_region_id on weather (region_id);
-            create index idx_weather_weather_type on weather (weather_type);
+            create index idx_weather_weather_type on weather (weather_type_id);
         </sql>
     </changeSet>
 </databaseChangeLog>

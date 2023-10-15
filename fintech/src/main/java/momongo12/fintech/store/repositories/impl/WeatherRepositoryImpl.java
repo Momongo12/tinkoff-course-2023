@@ -1,6 +1,7 @@
-package momongo12.fintech.store.repositories;
+package momongo12.fintech.store.repositories.impl;
 
 import momongo12.fintech.store.entities.Weather;
+import momongo12.fintech.store.repositories.WeatherRepository;
 
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
  * Weather data is stored as lists, where each region ID is mapped to a list of Weather objects.
  *
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @Component
 public class WeatherRepositoryImpl implements WeatherRepository {
@@ -42,10 +43,21 @@ public class WeatherRepositoryImpl implements WeatherRepository {
     }
 
     @Override
-    public void addWeatherData(Weather weather) {
+    public void save(Weather weather) {
         mapOfRegionalTemperatureData
-                .computeIfAbsent(weather.getRegionId(), k -> new CopyOnWriteArrayList<>())
+                .computeIfAbsent(weather.getRegion().getId(), k -> new CopyOnWriteArrayList<>())
                 .add(weather);
+    }
+
+    @Override
+    public void updateTemperatureById(int weatherId, double newTemperature) {
+        mapOfRegionalTemperatureData.values().forEach(weatherList -> {
+            weatherList.forEach(weather -> {
+                if (weather.getId() == weatherId) {
+                    weather.setTemperatureValue(newTemperature);
+                }
+            });
+        });
     }
 
     @Override

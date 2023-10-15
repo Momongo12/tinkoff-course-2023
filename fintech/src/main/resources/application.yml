@@ -1,7 +1,6 @@
 app:
   weather-api:
     token: ${WEATHER_API_TOKEN}
-
 spring:
   datasource:
       url: jdbc:h2:mem:weather_application
@@ -13,3 +12,7 @@ spring:
       enabled: true
   liquibase:
     change-log: classpath:changelog/main-db-changelog.xml
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none

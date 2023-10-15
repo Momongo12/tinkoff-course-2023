@@ -6,10 +6,12 @@ import lombok.extern.log4j.Log4j2;
 import momongo12.fintech.api.dto.WeatherDto;
 import momongo12.fintech.services.WeatherService;
 import momongo12.fintech.store.entities.Weather;
+import momongo12.fintech.store.repositories.RegionRepository;
 import momongo12.fintech.store.repositories.WeatherRepository;
 import momongo12.fintech.utils.WeatherFactory;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.NoSuchElementException;
@@ -18,7 +20,7 @@ import java.util.stream.Stream;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @Service
 @Log4j2
@@ -26,13 +28,16 @@ import java.util.stream.Stream;
 public class WeatherServiceImpl implements WeatherService {
     private final WeatherFactory weatherFactory;
     private final WeatherRepository weatherRepository;
+    private final RegionRepository regionRepository;
 
+    @Transactional(readOnly = true)
     @Override
     public Stream<Weather> getCurrentTemperatureByRegionName(String regionName) {
         log.info("Getting current temperature data for region: {}", regionName);
         return weatherRepository.findTemperatureDataByRegionId(weatherFactory.getRegionIdByRegionName(regionName));
     }
 
+    @Transactional
     @Override
     public Optional<Weather> addNewRegion(String regionName, WeatherDto weatherDto) {
         Weather weather;
@@ -44,7 +49,8 @@ public class WeatherServiceImpl implements WeatherService {
         }
 
         log.info("Adding new weather data for region: {}", regionName);
-        weatherRepository.addWeatherData(weather);
+        regionRepository.saveAndFlush(weather.getRegion());
+        weatherRepository.save(weather);
 
         return Optional.of(weather);
     }
@@ -56,12 +62,15 @@ public class WeatherServiceImpl implements WeatherService {
 
         weatherOptional.ifPresent(weather -> {
             log.info("Updating temperature data for region: {}. New temperature: {}", regionName, weatherDto.getTemperatureValue());
+
             weather.setTemperatureValue(weatherDto.getTemperatureValue());
+            weatherRepository.updateTemperatureById(weather.getId(), weatherDto.getTemperatureValue());
         });
 
         return weatherOptional;
     }
 
+    @Transactional
     @Override
     public Optional<Long> deleteRegionData(String regionName) {
         try {
@@ -75,6 +84,7 @@ public class WeatherServiceImpl implements WeatherService {
         }
     }
 
+    @Transactional
     @Override
     public boolean temperatureWithThisDateAtRegionExist(String regionName, Instant date) {
         log.debug("Checking if temperature data with date {} exists for region: {}", date, regionName);
