@@ -5,6 +5,7 @@ import momongo12.fintech.store.entities.Weather;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
@@ -12,9 +13,10 @@ import java.util.Optional;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
-public interface WeatherJpaRepository extends JpaRepository<Weather, Integer> {
+@Repository(value = "WeatherJpaRepository")
+public interface WeatherJpaRepository extends JpaRepository<Weather, Integer>, WeatherRepository {
 
     /**
      * Retrieves a list of Weather objects representing temperature data for a specific region.
@@ -32,8 +34,17 @@ public interface WeatherJpaRepository extends JpaRepository<Weather, Integer> {
      * @param measuringDate The timestamp indicating when the weather data was measured.
      * @return An Optional containing the Weather object if found, or an empty Optional if not found.
      */
-    @Query(value = "SELECT * FROM weather WHERE region_id = :regionId AND measuring_date = :measuringDate;", nativeQuery = true)
+    @Query(value = "SELECT * FROM weather WHERE region_id = :regionId AND measuring_date = :measuringDate", nativeQuery = true)
     Optional<Weather> findWeatherByRegionIdAndMeasuringDate(int regionId, Instant measuringDate);
+
+    /**
+     * Adds weather data to the data store.
+     *
+     * @param weather The Weather object representing the weather data to be added.
+     */
+    default Weather addWeatherData(Weather weather) {
+        return save(weather);
+    }
 
     /**
      * Updates the temperature value for a weather record based on the specified weather ID.

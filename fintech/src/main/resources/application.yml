@@ -1,6 +1,8 @@
 app:
   weather-api:
     token: ${WEATHER_API_TOKEN}
+  weather-repository:
+    implementation: WeatherJpaRepository
 spring:
   datasource:
       url: jdbc:h2:mem:weather_application

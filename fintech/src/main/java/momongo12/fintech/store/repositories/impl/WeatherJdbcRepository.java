@@ -7,7 +7,6 @@ import momongo12.fintech.store.entities.Weather;
 import momongo12.fintech.store.entities.WeatherType;
 import momongo12.fintech.store.repositories.WeatherRepository;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,23 +16,22 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
-@Repository
+@Repository(value = "WeatherJdbcRepository")
 @RequiredArgsConstructor
-@Primary
 public class WeatherJdbcRepository implements WeatherRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Stream<Weather> findTemperatureDataByRegionId(int regionId) {
+    public List<Weather> findTemperatureDataByRegionId(int regionId) {
         String sql = """
                      SELECT w.*, wt.*, r.*
                      FROM weather w
@@ -42,7 +40,7 @@ public class WeatherJdbcRepository implements WeatherRepository {
                      WHERE w.region_id = ?
                      """;
 
-        return jdbcTemplate.queryForStream(sql, new WeatherRowMapper(), regionId);
+        return jdbcTemplate.queryForStream(sql, new WeatherRowMapper(), regionId).toList();
     }
 
     @Override
@@ -66,7 +64,7 @@ public class WeatherJdbcRepository implements WeatherRepository {
     }
 
     @Override
-    public void save(Weather weather) {
+    public Weather addWeatherData(Weather weather) {
         String sql = "INSERT INTO weather (temperature, measuring_date, weather_type_id, region_id) VALUES (?, ?, ?, ?)";
         Object[] params = {
                 weather.getTemperatureValue(),
@@ -76,6 +74,8 @@ public class WeatherJdbcRepository implements WeatherRepository {
         };
 
         jdbcTemplate.update(sql, params);
+
+        return weather;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class WeatherJdbcRepository implements WeatherRepository {
     }
 
     @Override
-    public long deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException {
+    public int deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException {
         String sql = "DELETE FROM weather WHERE region_id = ?";
 
         int rowsAffected = jdbcTemplate.update(sql, regionId);

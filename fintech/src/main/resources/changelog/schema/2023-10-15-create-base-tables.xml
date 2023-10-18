@@ -34,7 +34,7 @@
             (
                 id int AUTO_INCREMENT,
                 temperature float,
-                measuring_date date,
+                measuring_date timestamp,
                 weather_type_id int,
                 region_id int,
                 primary key (id),

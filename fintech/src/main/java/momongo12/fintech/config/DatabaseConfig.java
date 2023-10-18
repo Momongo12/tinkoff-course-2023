@@ -3,6 +3,9 @@ package momongo12.fintech.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import momongo12.fintech.store.repositories.WeatherRepository;
+
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +15,7 @@ import javax.sql.DataSource;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @Configuration
 public class DatabaseConfig {
@@ -26,6 +29,9 @@ public class DatabaseConfig {
     @Value("${spring.datasource.password}")
     private String password;
 
+    @Value("${app.weather-repository.implementation}")
+    private String weatherRepositoryImplName;
+
     @Bean
     public DataSource dataSource() {
         HikariConfig config = new HikariConfig();
@@ -38,5 +44,10 @@ public class DatabaseConfig {
     @Bean
     public JdbcTemplate jdbcTemplate(DataSource dataSource) {
         return new JdbcTemplate(dataSource);
+    }
+
+    @Bean(name = "weatherRepositoryForWeatherServiceImpl")
+    public WeatherRepository weatherRepository(BeanFactory beanFactory) {
+        return (WeatherRepository) beanFactory.getBean(weatherRepositoryImplName);
     }
 }

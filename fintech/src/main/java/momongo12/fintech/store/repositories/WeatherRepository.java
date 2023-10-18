@@ -3,23 +3,23 @@ package momongo12.fintech.store.repositories;
 import momongo12.fintech.store.entities.Weather;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author Momongo12
- * @version 1.1
+ * @version 1.2
  */
 public interface WeatherRepository {
 
     /**
-     * Retrieves a stream of Weather objects representing temperature data for a specific region.
+     * Retrieves a list of Weather objects representing temperature data for a specific region.
      *
      * @param regionId The unique identifier of the region.
-     * @return A stream of Weather objects representing temperature data for the specified region.
+     * @return A list of Weather objects representing temperature data for the specified region.
      */
-    Stream<Weather> findTemperatureDataByRegionId(int regionId);
+    List<Weather> findTemperatureDataByRegionId(int regionId);
 
     /**
      * Retrieves weather data for a specific region based on the region ID, measuring date, and region name.
@@ -35,7 +35,7 @@ public interface WeatherRepository {
      *
      * @param weather The Weather object representing the weather data to be added.
      */
-    void save(Weather weather);
+    Weather addWeatherData(Weather weather);
 
     /**
      * Updates the temperature value for a weather record based on the specified weather ID.
@@ -52,5 +52,5 @@ public interface WeatherRepository {
      * @return number deleted weather objects
      * @throws NoSuchElementException If no weather data is found for the specified region ID.
      */
-    long deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException;
+    int deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException;
 }
