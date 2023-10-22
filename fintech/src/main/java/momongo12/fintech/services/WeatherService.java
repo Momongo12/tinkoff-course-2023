@@ -43,9 +43,10 @@ public interface WeatherService {
      * Deletes all weather data for a specific region by its name.
      *
      * @param regionName The name of the region to delete weather data for.
-     * @return An Optional containing the deleted Weather object, or empty if the operation fails.
+     * @return An Optional containing the deleted Weather object count, or empty if the operation fails or
+     * weather data for a specific region not found.
      */
-    Optional<Long> deleteRegionData(String regionName);
+    Optional<Integer> deleteRegionData(String regionName);
 
     /**
      * Checks if temperature data for a specific date and region exists.

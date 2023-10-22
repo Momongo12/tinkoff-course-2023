@@ -1,14 +1,14 @@
-package momongo12.fintech.store.repositories;
+package momongo12.fintech.store.repositories.impl;
 
 import momongo12.fintech.store.entities.Weather;
+import momongo12.fintech.store.repositories.WeatherRepository;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Stream;
 
 /**
  * The WeatherRepositoryImpl class represents an implementation of the {@link WeatherRepository} interface.
@@ -18,18 +18,17 @@ import java.util.stream.Stream;
  * Weather data is stored as lists, where each region ID is mapped to a list of Weather objects.
  *
  * @author Momongo12
- * @version 1.0
+ * @version 1.2
  */
-@Component
+@Repository(value = "WeatherHeapRepository")
 public class WeatherRepositoryImpl implements WeatherRepository {
 
     private static final Map<Integer, List<Weather>> mapOfRegionalTemperatureData = new ConcurrentHashMap<>();
 
     @Override
-    public Stream<Weather> findTemperatureDataByRegionId(int regionId) {
+    public List<Weather> findTemperatureDataByRegionId(int regionId) {
         return mapOfRegionalTemperatureData
-                .getOrDefault(regionId, new ArrayList<>())
-                .stream();
+                .getOrDefault(regionId, new ArrayList<>());
     }
 
     @Override
@@ -42,19 +41,32 @@ public class WeatherRepositoryImpl implements WeatherRepository {
     }
 
     @Override
-    public void addWeatherData(Weather weather) {
+    public Weather addWeatherData(Weather weather) {
         mapOfRegionalTemperatureData
-                .computeIfAbsent(weather.getRegionId(), k -> new CopyOnWriteArrayList<>())
+                .computeIfAbsent(weather.getRegion().getId(), k -> new CopyOnWriteArrayList<>())
                 .add(weather);
+
+        return weather;
     }
 
     @Override
-    public long deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException {
+    public void updateTemperatureById(int weatherId, double newTemperature) {
+        mapOfRegionalTemperatureData.values().forEach(weatherList -> {
+            weatherList.forEach(weather -> {
+                if (weather.getId() == weatherId) {
+                    weather.setTemperatureValue(newTemperature);
+                }
+            });
+        });
+    }
+
+    @Override
+    public int deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException {
         if (!mapOfRegionalTemperatureData.containsKey(regionId)) {
             throw new NoSuchElementException("Weather data for region with regionId=%d not found".formatted(regionId));
         }
 
-        long numberWeatherObjectsAtRegion = findTemperatureDataByRegionId(regionId).count();
+        int numberWeatherObjectsAtRegion = findTemperatureDataByRegionId(regionId).size();
 
         mapOfRegionalTemperatureData.remove(regionId);
 

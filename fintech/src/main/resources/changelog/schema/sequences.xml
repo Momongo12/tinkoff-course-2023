@@ -1,0 +1,14 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    <changeSet id="create-sequence-region-seq" author="Momongo12">
+        <createSequence sequenceName="REGION_SEQ" startValue="1" incrementBy="50"/>
+    </changeSet>
+    <changeSet id="create-sequence-weather-type-seq" author="Momongo12">
+        <createSequence sequenceName="WEATHER_TYPE_SEQ" startValue="1" incrementBy="50"/>
+    </changeSet>
+    <changeSet id="create-sequence-weather-seq" author="Momongo12">
+        <createSequence sequenceName="WEATHER_SEQ" startValue="1" incrementBy="50"/>
+    </changeSet>
+</databaseChangeLog>

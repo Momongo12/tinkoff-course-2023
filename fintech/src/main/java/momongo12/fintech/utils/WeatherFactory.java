@@ -2,6 +2,7 @@ package momongo12.fintech.utils;
 
 import lombok.NoArgsConstructor;
 
+import momongo12.fintech.store.entities.Region;
 import momongo12.fintech.store.entities.Weather;
 
 import org.springframework.stereotype.Component;
@@ -13,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Momongo12
- * @version 1.2
+ * @version 1.3
  */
 @Component
 @NoArgsConstructor
@@ -34,10 +35,11 @@ public class WeatherFactory {
      * @apiNote This method is thread-safe
      */
     public Weather createWeather(String regionName, double temperatureValue, Instant measuringDate) {
+        Region region = Region.builder().name(regionName).id(getRegionIdByRegionName(regionName)).build();
+
         return Weather
                 .builder()
-                .regionId(getRegionIdByRegionName(regionName))
-                .regionName(regionName)
+                .region(region)
                 .temperatureValue(temperatureValue)
                 .measuringDate(measuringDate)
                 .build();
