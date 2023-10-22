@@ -9,7 +9,7 @@
         <sql>
             create table region
             (
-                id int AUTO_INCREMENT,
+                id int,
                 name varchar(50),
                 primary key (id)
             )
@@ -20,9 +20,9 @@
         <sql>
             create table weather_type
             (
-                id int AUTO_INCREMENT,
+                id int,
                 description varchar(50),
-                representation varchar(30),
+                representation varchar(100),
                 primary key (id)
             )
         </sql>
@@ -43,6 +43,7 @@
             );
             create index idx_weather_region_id on weather (region_id);
             create index idx_weather_weather_type on weather (weather_type_id);
+            create index idx_weather_measuring_date_region_id on weather (measuring_date, region_id);
         </sql>
     </changeSet>
 </databaseChangeLog>

@@ -6,7 +6,7 @@ import lombok.*;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @Data
 @NoArgsConstructor
@@ -17,7 +17,6 @@ import lombok.*;
 public class WeatherType {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
     public int id;
 

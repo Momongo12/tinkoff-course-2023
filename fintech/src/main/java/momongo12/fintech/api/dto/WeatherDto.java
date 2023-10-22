@@ -6,7 +6,7 @@ import java.time.Instant;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @Data
 @NoArgsConstructor
@@ -15,6 +15,6 @@ import java.time.Instant;
 public class WeatherDto {
     private int regionId;
     private String regionName;
-    private double temperatureValue;
+    private Double temperatureValue;
     private Instant measuringDate;
 }

@@ -9,7 +9,7 @@ import java.time.Instant;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,5 +51,20 @@ public class WeatherApiResponse {
 
         @JsonProperty("humidity")
         private Integer humidity;
+
+        @JsonProperty("condition")
+        private Condition weatherType;
+
+        @Data
+        public static class Condition {
+            @JsonProperty("text")
+            private String text;
+
+            @JsonProperty("icon")
+            private String representation;
+
+            @JsonProperty("code")
+            private Integer code;
+        }
     }
 }
