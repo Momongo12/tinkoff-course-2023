@@ -34,7 +34,7 @@ import java.util.stream.Stream;
  * and updates/saves weather data using {@link WeatherApiClient} if some required data is not passed in.
  *
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @Service
 @Log4j2
@@ -81,7 +81,7 @@ public class WeatherServiceWithWeatherApiImpl implements WeatherService {
         return Optional.of(weatherRepository.addWeatherData(weather));
     }
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Override
     public Optional<Weather> updateTemperatureByRegionName(String regionName, WeatherDto weatherDto) {
         if (weatherDto.getTemperatureValue() == null) {
@@ -144,6 +144,7 @@ public class WeatherServiceWithWeatherApiImpl implements WeatherService {
             Weather weatherForSaveDb = weatherMapper.weatherApiResponseToWeather(responseOptional.get());
             weatherForSaveDb.getRegion().setId(weatherFactory.getRegionIdByRegionName(regionName));
 
+            transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
 
             transactionTemplate.executeWithoutResult((transactionStatus -> {
