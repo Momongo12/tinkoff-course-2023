@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 @Data
 @NoArgsConstructor
@@ -19,7 +19,6 @@ import java.util.List;
 public class Region {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id")
     private int id;
 
