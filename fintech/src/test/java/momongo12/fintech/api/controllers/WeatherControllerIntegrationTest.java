@@ -7,7 +7,9 @@ import lombok.experimental.FieldDefaults;
 import momongo12.fintech.api.dto.ErrorResponse;
 import momongo12.fintech.api.dto.WeatherDto;
 import momongo12.fintech.api.mappers.WeatherMapper;
+import momongo12.fintech.store.entities.Region;
 import momongo12.fintech.store.entities.Weather;
+import momongo12.fintech.store.repositories.RegionRepository;
 import momongo12.fintech.store.repositories.WeatherRepository;
 import momongo12.fintech.utils.WeatherFactory;
 
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -25,6 +28,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import java.time.Instant;
 import java.util.List;
@@ -34,29 +44,48 @@ import java.util.List;
  * @version 1.0
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@Testcontainers
 public class WeatherControllerIntegrationTest {
 
     @LocalServerPort
-    int port;
+    private int port;
 
     @Autowired
-    TestRestTemplate restTemplate;
+    private TestRestTemplate restTemplate;
 
     @Autowired
-    WeatherRepository weatherRepository;
+    @Qualifier("weatherRepositoryForWeatherServiceImpl")
+    private WeatherRepository weatherRepository;
 
     @Autowired
-    WeatherFactory weatherFactory;
+    private RegionRepository regionRepository;
 
     @Autowired
-    WeatherMapper weatherMapper;
+    private WeatherFactory weatherFactory;
 
-    Weather testWeatherObject;
+    @Autowired
+    private WeatherMapper weatherMapper;
+
+    private Weather testWeatherObject;
+
+    @Container
+    public static GenericContainer h2 = new GenericContainer(DockerImageName.parse("oscarfonts/h2"))
+            .withExposedPorts(1521, 81)
+            .withEnv("H2_OPTIONS", "-ifNotExists")
+            .waitingFor(Wait.defaultWaitStrategy());
+
+    @DynamicPropertySource
+    public static void setPropertySource(DynamicPropertyRegistry dynamicPropertySource) {
+        dynamicPropertySource.add("spring.datasource.url",
+                () -> "jdbc:h2:tcp://localhost:%d/test".formatted(h2.getMappedPort(1521)));
+    }
 
     @PostConstruct
     public void init () {
-        testWeatherObject = weatherFactory.createWeather("regionName", 10.0);
+        Region region = Region.builder().id(1).name("regionName").build();
+        regionRepository.saveAndFlush(region);
+        testWeatherObject = Weather.builder().region(region).temperatureValue(10.0).measuringDate(Instant.now()).build();
+        weatherRepository.addWeatherData(testWeatherObject);
     }
 
     @BeforeEach
@@ -66,13 +95,13 @@ public class WeatherControllerIntegrationTest {
 
     @AfterEach
     public void cleanUp() {
-        weatherRepository.deleteWeatherDataByRegionId(testWeatherObject.getRegionId());
+        weatherRepository.deleteWeatherDataByRegionId(testWeatherObject.getRegion().getId());
     }
 
     @Test
     public void testGetCurrentTemperatureWithExistingData() {
         ResponseEntity<List<WeatherDto>> responseEntity = restTemplate.exchange(
-                createURL("/api/weather/" + testWeatherObject.getRegionName()),
+                createURL("/api/weather/" + testWeatherObject.getRegion().getName()),
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {});
@@ -96,7 +125,7 @@ public class WeatherControllerIntegrationTest {
     @Test
     public void testCreateNewRegionWhenDataExists() {
         ResponseEntity<ErrorResponse> responseEntity = restTemplate
-                .postForEntity(createURL("/api/weather/" + testWeatherObject.getRegionName()),
+                .postForEntity(createURL("/api/weather/" + testWeatherObject.getRegion().getName()),
                         weatherMapper.weatherToWeatherDto(testWeatherObject),
                             ErrorResponse.class);
 
@@ -106,7 +135,7 @@ public class WeatherControllerIntegrationTest {
 
     @Test
     public void testCreateNewRegionWhenDataDoesNotExist() {
-        WeatherDto weatherDto = createTestWeatherDto(2, "NotExistRegion",
+        WeatherDto weatherDto = createTestWeatherDto(1, "NotExistRegion",
                 Instant.now(), 10.0);
 
         ResponseEntity<WeatherDto> responseEntity = restTemplate
@@ -121,7 +150,7 @@ public class WeatherControllerIntegrationTest {
 
     @Test
     public void testUpdateTemperatureWhenDataExists() {
-        WeatherDto weatherDto = createTestWeatherDto(1, testWeatherObject.getRegionName(),
+        WeatherDto weatherDto = createTestWeatherDto(1, testWeatherObject.getRegion().getName(),
                 testWeatherObject.getMeasuringDate(), 5.0);
 
         ResponseEntity<WeatherDto> responseEntity = restTemplate.exchange(
@@ -131,13 +160,13 @@ public class WeatherControllerIntegrationTest {
                 WeatherDto.class);
 
         assertNotNull(responseEntity.getBody());
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(weatherDto, responseEntity.getBody());
     }
 
     @Test
     public void testUpdateTemperatureWhenDataDoesNotExist() {
-        WeatherDto weatherDto = createTestWeatherDto(2, "NotExistRegion", Instant.now(), 5.0);
+        WeatherDto weatherDto = createTestWeatherDto(1, "NotExistRegion", Instant.now(), 5.0);
 
         ResponseEntity<WeatherDto> responseEntity = restTemplate.exchange(
                 createURL("/api/weather/" + weatherDto.getRegionName()),
@@ -156,7 +185,7 @@ public class WeatherControllerIntegrationTest {
         weatherRepository.addWeatherData(weather);
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(
-                createURL("/api/weather/" + weather.getRegionName()),
+                createURL("/api/weather/" + weather.getRegion().getName()),
                 HttpMethod.DELETE,
                 null,
                 String.class);
