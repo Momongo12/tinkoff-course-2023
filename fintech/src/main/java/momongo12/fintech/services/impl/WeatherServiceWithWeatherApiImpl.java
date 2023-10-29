@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -34,7 +35,7 @@ import java.util.stream.Stream;
  * and updates/saves weather data using {@link WeatherApiClient} if some required data is not passed in.
  *
  * @author Momongo12
- * @version 1.1
+ * @version 1.2
  */
 @Service
 @Log4j2
@@ -57,9 +58,16 @@ public class WeatherServiceWithWeatherApiImpl implements WeatherService {
     public Stream<Weather> getCurrentTemperatureByRegionName(String regionName) {
         log.info("Getting current temperature data for region: {}", regionName);
 
-        updateWeatherDataByRegionName(regionName);
+        List<Weather> weatherList = weatherRepository
+                .findTemperatureDataByRegionId(weatherFactory.getRegionIdByRegionName(regionName));
 
-        return weatherRepository.findTemperatureDataByRegionId(weatherFactory.getRegionIdByRegionName(regionName)).stream();
+        if (weatherList.isEmpty()) {
+            updateWeatherDataByRegionName(regionName);
+
+            return weatherRepository.findTemperatureDataByRegionId(weatherFactory.getRegionIdByRegionName(regionName)).stream();
+        }
+
+        return weatherList.stream();
     }
 
     @Transactional
