@@ -2,10 +2,11 @@ package momongo12.fintech.store;
 
 
 import momongo12.fintech.store.entities.Weather;
-import momongo12.fintech.store.repositories.WeatherRepository;
+import momongo12.fintech.store.repositories.impl.WeatherRepositoryImpl;
 import momongo12.fintech.utils.WeatherFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Instant;
@@ -20,29 +21,30 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 public class WeatherRepositoryImplTest {
 
-    private final WeatherRepository weatherRepository;
+    private final WeatherRepositoryImpl weatherRepository;
     private final WeatherFactory weatherFactory;
 
     @Autowired
-    public WeatherRepositoryImplTest(WeatherRepository weatherRepository, WeatherFactory weatherFactory) {
+    public WeatherRepositoryImplTest(@Qualifier("WeatherHeapRepository") WeatherRepositoryImpl weatherRepository, WeatherFactory weatherFactory) {
         this.weatherRepository = weatherRepository;
         this.weatherFactory = weatherFactory;
     }
 
 
     @Test
-    void testAddWeatherDataAndFindTemperatureDataByRegionId() {
+    void testSaveAndFindTemperatureDataByRegionId() {
         Weather weather = weatherFactory.createWeather("region1", 5.0);
         weatherRepository.addWeatherData(weather);
 
         assertTrue(weatherRepository
-                .findTemperatureDataByRegionId(weather.getRegionId())
+                .findTemperatureDataByRegionId(weather.getRegion().getId())
+                .stream()
                 .anyMatch(w -> Double.compare(w.getTemperatureValue(), weather.getTemperatureValue()) == 0));
     }
 
     @Test
     void testFindTemperatureDataByRegionIdNotFound() {
-        assertFalse(weatherRepository.findTemperatureDataByRegionId(100).findFirst().isPresent());
+        assertFalse(weatherRepository.findTemperatureDataByRegionId(100).stream().findFirst().isPresent());
     }
 
     @Test
@@ -50,7 +52,7 @@ public class WeatherRepositoryImplTest {
         Weather weather = weatherFactory.createWeather("region2", 10.0);
         weatherRepository.addWeatherData(weather);
 
-        assertTrue(weatherRepository.findWeatherByRegionIdAndMeasuringDate(weather.getRegionId(), weather.getMeasuringDate()).isPresent());
+        assertTrue(weatherRepository.findWeatherByRegionIdAndMeasuringDate(weather.getRegion().getId(), weather.getMeasuringDate()).isPresent());
     }
 
     @Test
@@ -63,9 +65,9 @@ public class WeatherRepositoryImplTest {
         Weather weather = weatherFactory.createWeather("region3", 11.0);
         weatherRepository.addWeatherData(weather);
 
-        weatherRepository.deleteWeatherDataByRegionId(weather.getRegionId());
+        weatherRepository.deleteWeatherDataByRegionId(weather.getRegion().getId());
 
-        assertFalse(weatherRepository.findTemperatureDataByRegionId(weather.getRegionId()).findFirst().isPresent());
+        assertFalse(weatherRepository.findTemperatureDataByRegionId(weather.getRegion().getId()).stream().findFirst().isPresent());
     }
 
     @Test

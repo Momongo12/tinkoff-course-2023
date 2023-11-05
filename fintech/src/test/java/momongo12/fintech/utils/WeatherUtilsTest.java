@@ -4,9 +4,6 @@ package momongo12.fintech.utils;
 import static org.junit.jupiter.api.Assertions.*;
 
 import momongo12.fintech.store.entities.Weather;
-import org.junit.After;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,16 +18,13 @@ import java.util.Map;
  * @author Momongo12
  * @version 1.1
  */
-@SpringBootTest
 public class WeatherUtilsTest {
 
-    private final WeatherFactory weatherFactory;
     private final List<Weather> weatherListTestCase1;
     private final List<Weather> weatherListTestCase2;
 
-    @Autowired
-    public WeatherUtilsTest(WeatherFactory weatherFactory) {
-        this.weatherFactory = weatherFactory;
+    public WeatherUtilsTest() {
+        WeatherFactory weatherFactory = new WeatherFactory();
 
         weatherListTestCase1 = new ArrayList<>();
         weatherListTestCase1.add(weatherFactory.createWeather("region1", 1.0));
@@ -67,7 +61,7 @@ public class WeatherUtilsTest {
 
     @Test
     public void testConvertToMapGroupingByRegionId() {
-        int idSomeRegion = weatherListTestCase1.get(0).getRegionId();
+        int idSomeRegion = weatherListTestCase1.get(0).getRegion().getId();
         double temperatureSameRegion = weatherListTestCase1.get(0).getTemperatureValue();
 
         Map<Integer, List<Double>> convertedWeatherList = WeatherUtils.convertToMapGroupingByRegionId(weatherListTestCase1);
@@ -80,7 +74,7 @@ public class WeatherUtilsTest {
 
     @Test
     public void testConvertToMapGroupingByRegionIdWithRepeatingRegionId() {
-        int idSomeRegion = weatherListTestCase2.get(0).getRegionId();
+        int idSomeRegion = weatherListTestCase2.get(0).getRegion().getId();
         double temperatureSameRegion = weatherListTestCase2.get(0).getTemperatureValue();
 
         Map<Integer, List<Double>> convertedWeatherList = WeatherUtils.convertToMapGroupingByRegionId(weatherListTestCase2);

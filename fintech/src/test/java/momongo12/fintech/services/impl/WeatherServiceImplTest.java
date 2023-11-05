@@ -3,16 +3,20 @@ package momongo12.fintech.services.impl;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import momongo12.fintech.api.dto.WeatherDto;
+import momongo12.fintech.store.entities.Region;
 import momongo12.fintech.store.entities.Weather;
+import momongo12.fintech.store.repositories.RegionRepository;
 import momongo12.fintech.store.repositories.WeatherRepository;
 import momongo12.fintech.utils.WeatherFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -34,6 +38,9 @@ class WeatherServiceImplTest {
     @Mock
     WeatherFactory weatherFactory;
 
+    @Spy
+    RegionRepository regionRepository;
+
     @InjectMocks
     WeatherServiceImpl weatherService;
 
@@ -42,7 +49,7 @@ class WeatherServiceImplTest {
         int regionId = 1;
         String regionName = "regionName";
         when(weatherFactory.getRegionIdByRegionName(regionName)).thenReturn(regionId);
-        when(weatherRepository.findTemperatureDataByRegionId(regionId)).thenReturn(Stream.empty());
+        when(weatherRepository.findTemperatureDataByRegionId(regionId)).thenReturn(List.of());
 
         Stream<Weather> result = weatherService.getCurrentTemperatureByRegionName(regionName);
 
@@ -54,39 +61,49 @@ class WeatherServiceImplTest {
     @Test
     void testAddNewRegionWithMeasuringDate() {
         int regionId = 1;
+        int weatherId = 1;
         String regionName = "regionName";
         WeatherDto weatherDto = new WeatherDto(regionId, regionName, 10.0, Instant.now());
-        Weather weather = new Weather(regionId, regionName, weatherDto.getTemperatureValue(), weatherDto.getMeasuringDate());
+        Region region = Region.builder().id(regionId).name(regionName).build();
+        Weather weather = new Weather(weatherId, weatherDto.getTemperatureValue(), weatherDto.getMeasuringDate(), null, region);
         when(weatherFactory.createWeather(regionName, weatherDto.getTemperatureValue(), weatherDto.getMeasuringDate())).thenReturn(weather);
+        when(weatherRepository.addWeatherData(weather)).thenReturn(weather);
 
         Optional<Weather> result = weatherService.addNewRegion(regionName, weatherDto);
 
         assertEquals(weather, result.orElse(null));
         verify(weatherFactory, times(1)).createWeather(regionName, weatherDto.getTemperatureValue(), weatherDto.getMeasuringDate());
         verify(weatherRepository, times(1)).addWeatherData(weather);
+        verify(regionRepository, times(1)).saveAndFlush(weather.getRegion());
     }
 
     @Test
     void testAddNewRegionWithoutMeasuringDate() {
         int regionId = 1;
+        int weatherId = 1;
         String regionName = "regionName";
-        WeatherDto weatherDto = WeatherDto.builder().regionName(regionName).temperatureValue(10.0).build();
-        Weather weather = new Weather(regionId, regionName, weatherDto.getTemperatureValue(), weatherDto.getMeasuringDate());
+        WeatherDto weatherDto = new WeatherDto(regionId, regionName, 10.0, null);
+        Region region = Region.builder().id(regionId).name(regionName).build();
+        Weather weather = new Weather(weatherId, weatherDto.getTemperatureValue(), null, null, region);
         when(weatherFactory.createWeather(regionName, weatherDto.getTemperatureValue())).thenReturn(weather);
+        when(weatherRepository.addWeatherData(weather)).thenReturn(weather);
 
         Optional<Weather> result = weatherService.addNewRegion(regionName, weatherDto);
 
         assertEquals(weather, result.orElse(null));
         verify(weatherFactory, times(1)).createWeather(regionName, weatherDto.getTemperatureValue());
         verify(weatherRepository, times(1)).addWeatherData(weather);
+        verify(regionRepository, times(1)).saveAndFlush(weather.getRegion());
     }
 
     @Test
     void testUpdateTemperatureByRegionName() {
         int regionId = 1;
+        int weatherId = 1;
         String regionName = "regionName";
         WeatherDto weatherDto = new WeatherDto(regionId, regionName, 10.0, Instant.now());
-        Weather weather = new Weather(regionId, regionName, 15.0, weatherDto.getMeasuringDate());
+        Region region = Region.builder().id(regionId).name(regionName).build();
+        Weather weather = new Weather(weatherId, weatherDto.getTemperatureValue(), weatherDto.getMeasuringDate(), null, region);
         when(weatherFactory.getRegionIdByRegionName(regionName)).thenReturn(regionId);
         when(weatherRepository.findWeatherByRegionIdAndMeasuringDate(regionId, weatherDto.getMeasuringDate())).thenReturn(Optional.of(weather));
 
@@ -102,11 +119,11 @@ class WeatherServiceImplTest {
         int regionId = 1;
         String regionName = "regionName";
         when(weatherFactory.getRegionIdByRegionName(regionName)).thenReturn(regionId);
-        when(weatherRepository.deleteWeatherDataByRegionId(regionId)).thenReturn(1L);
+        when(weatherRepository.deleteWeatherDataByRegionId(regionId)).thenReturn(1);
 
-        Optional<Long> result = weatherService.deleteRegionData(regionName);
+        Optional<Integer> result = weatherService.deleteRegionData(regionName);
 
-        assertEquals(1L, result.orElseThrow());
+        assertEquals(1, result.orElseThrow());
         verify(weatherFactory, times(1)).getRegionIdByRegionName(regionName);
         verify(weatherRepository, times(1)).deleteWeatherDataByRegionId(regionId);
     }
@@ -118,7 +135,7 @@ class WeatherServiceImplTest {
         when(weatherFactory.getRegionIdByRegionName(regionName)).thenReturn(regionId);
         when(weatherRepository.deleteWeatherDataByRegionId(regionId)).thenThrow(new NoSuchElementException());
 
-        Optional<Long> result = weatherService.deleteRegionData(regionName);
+        Optional<Integer> result = weatherService.deleteRegionData(regionName);
 
         assertTrue(result.isEmpty());
         verify(weatherFactory, times(1)).getRegionIdByRegionName(regionName);
@@ -130,9 +147,10 @@ class WeatherServiceImplTest {
         int regionId = 1;
         String regionName = "regionName";
         Instant date = Instant.now();
-        Weather someWeather = Weather.builder().regionId(regionId).regionName(regionName).measuringDate(date).build();
+        Region region = Region.builder().id(regionId).name(regionName).build();
+        Weather someWeather = Weather.builder().region(region).measuringDate(date).build();
         when(weatherFactory.getRegionIdByRegionName(regionName)).thenReturn(regionId);
-        when(weatherRepository.findTemperatureDataByRegionId(regionId)).thenReturn(Stream.of(someWeather));
+        when(weatherRepository.findTemperatureDataByRegionId(regionId)).thenReturn(List.of(someWeather));
 
         assertTrue(weatherService.temperatureWithThisDateAtRegionExist(regionName, date));
 
@@ -146,7 +164,7 @@ class WeatherServiceImplTest {
         String regionName = "regionName";
         Instant date = Instant.now();
         when(weatherFactory.getRegionIdByRegionName(regionName)).thenReturn(regionId);
-        when(weatherRepository.findTemperatureDataByRegionId(regionId)).thenReturn(Stream.empty());
+        when(weatherRepository.findTemperatureDataByRegionId(regionId)).thenReturn(List.of());
 
         assertFalse(weatherService.temperatureWithThisDateAtRegionExist(regionName, date));
 
