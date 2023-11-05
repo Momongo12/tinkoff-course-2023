@@ -1,0 +1,47 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+
+    <changeSet id="2023-11-02-create-user-table" author="momongo12">
+        <createTable tableName="user">
+            <column name="user_id" type="int" defaultValueComputed="nextval('USER_SEQUENCE')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar (100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login" type="varchar (100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar (100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="2023-11-02-create-role-table" author="momongo12">
+        <createTable tableName="role">
+            <column name="role_id" type="int" defaultValueComputed="nextval('ROLE_SEQUENCE')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar (50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="2023-11-02-create-users-roles-table" author="momongo12">
+        <createTable tableName="users_roles">
+            <column name="users_roles_id" type="int"  defaultValueComputed="nextval('USERS_ROLES_SEQUENCE')">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="role_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_users_roles_role"
+                             referencedTableName="role" referencedColumnNames="role_id"/>
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_users_roles_user"
+                             referencedTableName="user" referencedColumnNames="user_id"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

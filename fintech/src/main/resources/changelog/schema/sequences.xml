@@ -5,4 +5,13 @@
     <changeSet id="create-sequence-weather-seq" author="Momongo12">
         <createSequence sequenceName="WEATHER_SEQ" startValue="1" incrementBy="50"/>
     </changeSet>
+    <changeSet id="2023-11-05-create-sequence-user-seq" author="momongo12">
+        <createSequence sequenceName="USER_SEQUENCE" startValue="1" incrementBy="1"/>
+    </changeSet>
+    <changeSet id="2023-11-05-create-sequence-role-seq" author="momongo12">
+        <createSequence sequenceName="ROLE_SEQUENCE" startValue="1" incrementBy="1"/>
+    </changeSet>
+    <changeSet id="2023-11-05-create-sequence-users-roles-seq" author="momongo12">
+        <createSequence sequenceName="USERS_ROLES_SEQUENCE" startValue="1" incrementBy="1"/>
+    </changeSet>
 </databaseChangeLog>
