@@ -21,7 +21,7 @@ import java.io.OutputStream;
 
 /**
  * @author momongo12
- * @version 1.0
+ * @version 1.1
  */
 @Component("customAccessDeniedHandler")
 @RequiredArgsConstructor
@@ -35,7 +35,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         ErrorResponse re = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Access Denied");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
         OutputStream responseStream = response.getOutputStream();
         objectMapper.writeValue(responseStream, re);
