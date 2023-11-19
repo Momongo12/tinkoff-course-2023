@@ -18,3 +18,8 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
+
+cache:
+  course:
+    size: 1000
+    expiry-time-in-seconds: 900

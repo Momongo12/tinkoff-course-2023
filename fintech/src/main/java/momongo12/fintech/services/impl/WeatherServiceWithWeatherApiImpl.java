@@ -8,6 +8,7 @@ import momongo12.fintech.api.dto.WeatherDto;
 import momongo12.fintech.api.mappers.WeatherMapper;
 import momongo12.fintech.services.WeatherService;
 import momongo12.fintech.services.remote.WeatherApiClient;
+import momongo12.fintech.store.WeatherLRUCache;
 import momongo12.fintech.store.entities.Weather;
 import momongo12.fintech.store.repositories.RegionRepository;
 import momongo12.fintech.store.repositories.WeatherRepository;
@@ -16,6 +17,7 @@ import momongo12.fintech.utils.WeatherFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
@@ -24,10 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * This class implements {@link WeatherService} functions similar to {@link WeatherServiceImpl},
@@ -35,7 +35,7 @@ import java.util.stream.Stream;
  * and updates/saves weather data using {@link WeatherApiClient} if some required data is not passed in.
  *
  * @author Momongo12
- * @version 1.2
+ * @version 1.3
  */
 @Service
 @Log4j2
@@ -47,27 +47,36 @@ public class WeatherServiceWithWeatherApiImpl implements WeatherService {
     @Qualifier("weatherRepositoryForWeatherServiceImpl")
     private WeatherRepository weatherRepository;
 
+    @Value("${cache.course.expiry-time-in-seconds:900}")
+    private long expireTimeInSeconds;
+
     private final WeatherFactory weatherFactory;
     private final RegionRepository regionRepository;
     private final WeatherMapper weatherMapper;
     private final WeatherApiClient weatherApiClient;
     private final WeatherTypeRepository weatherTypeRepository;
     private final TransactionTemplate transactionTemplate;
+    private final WeatherLRUCache weatherLRUCache;
 
     @Override
-    public Stream<Weather> getCurrentTemperatureByRegionName(String regionName) {
+    public Optional<Weather> getCurrentTemperatureByRegionName(String regionName) {
         log.info("Getting current temperature data for region: {}", regionName);
 
-        List<Weather> weatherList = weatherRepository
-                .findTemperatureDataByRegionId(weatherFactory.getRegionIdByRegionName(regionName));
+        Optional<Weather> weather = weatherLRUCache.get(regionName);
 
-        if (weatherList.isEmpty()) {
-            updateWeatherDataByRegionName(regionName);
-
-            return weatherRepository.findTemperatureDataByRegionId(weatherFactory.getRegionIdByRegionName(regionName)).stream();
+        if (weather.isPresent()) {
+            return weather;
         }
 
-        return weatherList.stream();
+        weather = getActualWeatherFromDB(regionName);
+
+        if (weather.isEmpty()) {
+            weather = updateWeatherDataByRegionName(regionName);
+        }
+
+        weather.ifPresent(value -> weatherLRUCache.put(regionName, value));
+
+        return weather;
     }
 
     @Transactional
@@ -93,7 +102,10 @@ public class WeatherServiceWithWeatherApiImpl implements WeatherService {
     @Override
     public Optional<Weather> updateTemperatureByRegionName(String regionName, WeatherDto weatherDto) {
         if (weatherDto.getTemperatureValue() == null) {
-            return updateWeatherDataByRegionName(regionName);
+            Optional<Weather> weatherOptional = updateWeatherDataByRegionName(regionName);
+
+            weatherOptional.ifPresent(weather -> weatherLRUCache.put(regionName, weather));
+            return weatherOptional;
         }
 
         int regionId = weatherFactory.getRegionIdByRegionName(regionName);
@@ -104,6 +116,7 @@ public class WeatherServiceWithWeatherApiImpl implements WeatherService {
 
             weather.setTemperatureValue(weatherDto.getTemperatureValue());
             weatherRepository.updateTemperatureById(weather.getId(), weatherDto.getTemperatureValue());
+            weatherLRUCache.put(regionName, weather);
         });
 
         return weatherOptional;
@@ -174,5 +187,20 @@ public class WeatherServiceWithWeatherApiImpl implements WeatherService {
         }
 
         return Optional.empty();
+    }
+
+    Optional<Weather> getActualWeatherFromDB(String regionName) {
+        return weatherRepository
+                .findTemperatureDataByRegionId(weatherFactory.getRegionIdByRegionName(regionName))
+                .stream()
+                .filter(this::weatherIsActual)
+                .findFirst();
+    }
+
+    boolean weatherIsActual(Weather weather) {
+        Instant currentTime = Instant.now();
+        Instant weatherMeasuringDate = weather.getMeasuringDate();
+
+        return currentTime.compareTo(weatherMeasuringDate.plusSeconds(expireTimeInSeconds)) >= 0;
     }
 }

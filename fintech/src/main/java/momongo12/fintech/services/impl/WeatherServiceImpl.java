@@ -14,13 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author Momongo12
- * @version 1.2
+ * @version 1.3
  */
 @Service
 @Log4j2
@@ -38,9 +38,13 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     @Override
-    public Stream<Weather> getCurrentTemperatureByRegionName(String regionName) {
+    public Optional<Weather> getCurrentTemperatureByRegionName(String regionName) {
         log.info("Getting current temperature data for region: {}", regionName);
-        return weatherRepository.findTemperatureDataByRegionId(weatherFactory.getRegionIdByRegionName(regionName)).stream();
+
+        List<Weather> weatherList = weatherRepository
+                .findTemperatureDataByRegionId(weatherFactory.getRegionIdByRegionName(regionName));
+
+        return weatherList.isEmpty()? Optional.empty() : Optional.of(weatherList.get(0));
     }
 
     @Transactional
