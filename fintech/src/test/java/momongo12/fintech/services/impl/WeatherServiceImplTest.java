@@ -2,14 +2,17 @@ package momongo12.fintech.services.impl;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+
 import momongo12.fintech.api.dto.WeatherDto;
 import momongo12.fintech.store.entities.Region;
 import momongo12.fintech.store.entities.Weather;
 import momongo12.fintech.store.repositories.RegionRepository;
 import momongo12.fintech.store.repositories.WeatherRepository;
 import momongo12.fintech.utils.WeatherFactory;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -19,7 +22,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -51,12 +53,13 @@ class WeatherServiceImplTest {
         when(weatherFactory.getRegionIdByRegionName(regionName)).thenReturn(regionId);
         when(weatherRepository.findTemperatureDataByRegionId(regionId)).thenReturn(List.of());
 
-        Stream<Weather> result = weatherService.getCurrentTemperatureByRegionName(regionName);
+        Optional<Weather> result = weatherService.getCurrentTemperatureByRegionName(regionName);
 
-        assertEquals(0, result.count());
+        assertTrue(result.isEmpty());
         verify(weatherFactory, times(1)).getRegionIdByRegionName(regionName);
         verify(weatherRepository, times(1)).findTemperatureDataByRegionId(regionId);
     }
+
 
     @Test
     void testAddNewRegionWithMeasuringDate() {
