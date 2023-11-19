@@ -49,6 +49,12 @@ public class WeatherLRUCache {
         tail.prev = head;
     }
 
+    /**
+     * Retrieves weather information for the specified region from the cache.
+     *
+     * @param regionName The name of the region for which weather information is requested.
+     * @return An Optional containing the weather information if present, otherwise an empty Optional.
+     */
     public Optional<Weather> get(String regionName) {
         lock.lock();
         try {
@@ -65,6 +71,14 @@ public class WeatherLRUCache {
         return Optional.empty();
     }
 
+    /**
+     * Puts weather information into the cache for the specified region.
+     * If the region already exists in the cache, it updates the weather information and moves the region to the most recently used position.
+     * If the cache is at its maximum size, it removes the least recently used weather data before adding the new data.
+     *
+     * @param regionName The name of the region for which weather information is stored.
+     * @param weather The Weather object containing the weather information for the specified region.
+     */
     public void put(String regionName, Weather weather) {
         lock.lock();
 
