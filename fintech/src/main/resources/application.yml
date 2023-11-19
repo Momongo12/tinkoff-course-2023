@@ -5,13 +5,13 @@ app:
     implementation: WeatherJpaRepository
 spring:
   datasource:
-      url: jdbc:h2:mem:weather_application
+      url: jdbc:h2:mem:weather_application;NON_KEYWORDS=user
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       driverClassName: org.h2.Driver
   h2:
     console:
-      enabled: true
+      enabled: false
   liquibase:
     change-log: classpath:changelog/main-db-changelog.xml
   jpa:

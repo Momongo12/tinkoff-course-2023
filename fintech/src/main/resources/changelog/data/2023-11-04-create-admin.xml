@@ -1,0 +1,24 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.0.xsd">
+    
+    <changeSet id="2023-11-04" author="momongo12">
+        <insert tableName="role">
+            <column name="name">ROLE_ADMIN</column>
+        </insert>
+    </changeSet>
+    <changeSet id="2023-11-04-create-user-with-admin-role" author="momomgo12">
+        <insert tableName="user">
+            <column name="username">admin</column>
+            <column name="login">${ADMIN_LOGIN}</column>
+            <column name="password">${ADMIN_PASSWORD}</column>
+        </insert>
+    </changeSet>
+    <changeSet id="2023-11-05-create-users-roles-record" author="momongo12">
+        <insert tableName="users_roles">
+            <column name="role_id" value="1"/>
+            <column name="user_id" value="1"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
