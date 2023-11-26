@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Momongo12
@@ -50,14 +50,13 @@ public class WeatherController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public List<WeatherDto> getCurrentTemperature(@PathVariable("regionName") String regionName) {
-        List<WeatherDto> weatherDtoList =  weatherService
+    public ResponseEntity<WeatherDto> getCurrentTemperature(@PathVariable("regionName") String regionName) {
+        Optional<WeatherDto> weatherDto = weatherService
                 .getCurrentTemperatureByRegionName(regionName)
-                .map(weatherMapper::weatherToWeatherDto)
-                .toList();
+                .map(weatherMapper::weatherToWeatherDto);
 
-        if (!weatherDtoList.isEmpty()) {
-            return weatherDtoList;
+        if (weatherDto.isPresent()) {
+            return ResponseEntity.ok(weatherDto.get());
         }else {
             throw new NotFoundException("Weather data not found for the specified region");
         }

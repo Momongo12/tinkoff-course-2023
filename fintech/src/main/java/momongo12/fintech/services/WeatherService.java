@@ -5,11 +5,10 @@ import momongo12.fintech.store.entities.Weather;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * @author Momongo12
- * @version 1.0
+ * @version 1.1
  */
 public interface WeatherService {
 
@@ -17,9 +16,9 @@ public interface WeatherService {
      * Retrieves the current temperature data for a specific region by its name.
      *
      * @param regionName The name of the region to retrieve temperature data for.
-     * @return A stream of Weather objects representing the current temperature data for the region.
+     * @return An Optional containing the weather object, or empty if the operation fails.
      */
-    Stream<Weather> getCurrentTemperatureByRegionName(String regionName);
+    Optional<Weather> getCurrentTemperatureByRegionName(String regionName);
 
     /**
      * Adds new weather data for a specific region.
