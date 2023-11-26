@@ -13,7 +13,7 @@ import java.util.Optional;
 
 /**
  * @author Momongo12
- * @version 1.1
+ * @version 1.2
  */
 @Repository(value = "WeatherJpaRepository")
 public interface WeatherJpaRepository extends JpaRepository<Weather, Integer>, WeatherRepository {
@@ -65,4 +65,19 @@ public interface WeatherJpaRepository extends JpaRepository<Weather, Integer>, W
     @Modifying
     @Query(value = "DELETE FROM weather WHERE region_id = :regionId", nativeQuery = true)
     int deleteWeatherDataByRegionId(int regionId);
+
+    @Query(value = "SELECT COUNT(*) FROM weather WHERE region_id = :regionId", nativeQuery = true)
+    long countByRegionId(int regionId);
+
+    @Query(value = """
+                    SELECT avg(temperature)
+                    FROM (
+                      SELECT temperature
+                      FROM weather
+                      WHERE region_id = :regionId
+                      ORDER BY measuring_date DESC
+                      LIMIT :numberPeriods
+                    ) AS temp_table
+                   """, nativeQuery = true)
+    Double calculateMovingAverage(int regionId, long numberPeriods);
 }

@@ -3,7 +3,16 @@ app:
     token: ${WEATHER_API_TOKEN}
   weather-repository:
     implementation: WeatherJpaRepository
+  regionsForScheduler: Moscow, Saint Petersburg, Novosibirsk, Yekaterinburg, Kurgan
+  periodsNumberForMovingAverage: 30
+  cron:
+    weatherApiScheduler: '0 0/1 * * * ?'
+  kafka:
+    topicNameForActualWeatherData: actual-weather
+
 spring:
+  application:
+    name: weather-application
   datasource:
       url: jdbc:h2:mem:weather_application;NON_KEYWORDS=user
       username: ${DB_USERNAME}
@@ -15,11 +24,29 @@ spring:
   liquibase:
     change-log: classpath:changelog/main-db-changelog.xml
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: none
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+      group-id: ${spring.application.name}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: momongo12.fintech.store.entities
+    producer:
+      acks: 1
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 cache:
   course:
     size: 1000
     expiry-time-in-seconds: 900
+
+logging:
+  level:
+    momongo12: debug

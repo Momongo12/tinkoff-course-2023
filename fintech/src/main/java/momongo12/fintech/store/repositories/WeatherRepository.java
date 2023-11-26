@@ -9,7 +9,7 @@ import java.util.Optional;
 
 /**
  * @author Momongo12
- * @version 1.2
+ * @version 1.3
  */
 public interface WeatherRepository {
 
@@ -53,4 +53,21 @@ public interface WeatherRepository {
      * @throws NoSuchElementException If no weather data is found for the specified region ID.
      */
     int deleteWeatherDataByRegionId(int regionId) throws NoSuchElementException;
+
+    /**
+     * Counts the number of weather records for a specific region.
+     *
+     * @param regionId The unique identifier of the region.
+     * @return The number of weather records for the specified region.
+     */
+    long countByRegionId(int regionId);
+
+    /**
+     * Calculates the moving average temperature for a specific region over a specified number of periods.
+     *
+     * @param regionId      The unique identifier of the region.
+     * @param numberPeriods The number of periods to consider for calculating the moving average.
+     * @return The calculated moving average temperature.
+     */
+    Double calculateMovingAverage(int regionId, long numberPeriods);
 }

@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Weather data is stored as lists, where each region ID is mapped to a list of Weather objects.
  *
  * @author Momongo12
- * @version 1.2
+ * @version 1.3
  */
 @Repository(value = "WeatherHeapRepository")
 public class WeatherRepositoryImpl implements WeatherRepository {
@@ -71,5 +71,15 @@ public class WeatherRepositoryImpl implements WeatherRepository {
         mapOfRegionalTemperatureData.remove(regionId);
 
         return numberWeatherObjectsAtRegion;
+    }
+
+    @Override
+    public long countByRegionId(int regionId) {
+        throw new UnsupportedOperationException("This operation is not supported for this implementation");
+    }
+
+    @Override
+    public Double calculateMovingAverage(int regionId, long numberPeriods) {
+        throw new UnsupportedOperationException("This operation is not supported for this implementation");
     }
 }
