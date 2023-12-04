@@ -22,7 +22,7 @@ import java.util.Optional;
 
 /**
  * @author Momongo12
- * @version 1.1
+ * @version 1.2
  */
 @Repository(value = "WeatherJdbcRepository")
 @RequiredArgsConstructor
@@ -98,6 +98,16 @@ public class WeatherJdbcRepository implements WeatherRepository {
             throw new NoSuchElementException("Weather data for region with regionId=%d not found".formatted(regionId));
         }
         return rowsAffected;
+    }
+
+    @Override
+    public long countByRegionId(int regionId) {
+        throw new UnsupportedOperationException("This operation is not supported for this implementation");
+    }
+
+    @Override
+    public Double calculateMovingAverage(int regionId, long numberPeriods) {
+        throw new UnsupportedOperationException("This operation is not supported for this implementation");
     }
 
     private static class WeatherRowMapper implements RowMapper<Weather> {
